@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.8.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/zztttt.github.io/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/zztttt.github.io/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/zztttt.github.io/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/zztttt.github.io/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/zztttt.github.io/css/main.css">
+
+
+<link rel="stylesheet" href="/zztttt.github.io/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"github.com","root":"/zztttt.github.io/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="RigidBody   属性 含义     Mass unity中的一重量单位   Drag 直线运动时的阻力   Angular Drag 角度改变时的阻力   Use Gravity 是否应用重力   is Kinematic 刚体是否可以产生运动的（勾选则完全锁定）   interpolate 插值，让刚体运动得更加自然（否则可能会抖）   Collision Detection 碰撞检测模">
+<meta name="keywords" content="csharp,unity">
+<meta property="og:type" content="article">
+<meta property="og:title" content="unity: 平衡球">
+<meta property="og:url" content="http://github.com/2020/08/12/unity-Cube/index.html">
+<meta property="og:site_name" content="zztttt">
+<meta property="og:description" content="RigidBody   属性 含义     Mass unity中的一重量单位   Drag 直线运动时的阻力   Angular Drag 角度改变时的阻力   Use Gravity 是否应用重力   is Kinematic 刚体是否可以产生运动的（勾选则完全锁定）   interpolate 插值，让刚体运动得更加自然（否则可能会抖）   Collision Detection 碰撞检测模">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2022-08-13T10:01:38.570Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="unity: 平衡球">
+<meta name="twitter:description" content="RigidBody   属性 含义     Mass unity中的一重量单位   Drag 直线运动时的阻力   Angular Drag 角度改变时的阻力   Use Gravity 是否应用重力   is Kinematic 刚体是否可以产生运动的（勾选则完全锁定）   interpolate 插值，让刚体运动得更加自然（否则可能会抖）   Collision Detection 碰撞检测模">
+
+<link rel="canonical" href="http://github.com/2020/08/12/unity-Cube/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>unity: 平衡球 | zztttt</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/zztttt.github.io/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">zztttt</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/zztttt.github.io/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/zztttt.github.io/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope="" itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://github.com/2020/08/12/unity-Cube/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/zztttt.github.io/images/avatar.gif">
+      <meta itemprop="name" content="ZhangZhengtong">
+      <meta itemprop="description" content="SE@SJTU">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="zztttt">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          unity: 平衡球
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-08-12 12:54:19" itemprop="dateCreated datePublished" datetime="2020-08-12T12:54:19+08:00">2020-08-12</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-08-13 18:01:38" itemprop="dateModified" datetime="2022-08-13T18:01:38+08:00">2022-08-13</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/zztttt.github.io/categories/zztttt/" itemprop="url" rel="index"><span itemprop="name">zztttt</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="RigidBody"><a href="#RigidBody" class="headerlink" title="RigidBody"></a>RigidBody</h2><table>
+<thead>
+<tr>
+<th>属性</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mass</td>
+<td>unity中的一重量单位</td>
+</tr>
+<tr>
+<td>Drag</td>
+<td>直线运动时的阻力</td>
+</tr>
+<tr>
+<td>Angular Drag</td>
+<td>角度改变时的阻力</td>
+</tr>
+<tr>
+<td>Use Gravity</td>
+<td>是否应用重力</td>
+</tr>
+<tr>
+<td>is Kinematic</td>
+<td>刚体是否可以产生运动的（勾选则完全锁定）</td>
+</tr>
+<tr>
+<td>interpolate</td>
+<td>插值，让刚体运动得更加自然（否则可能会抖）</td>
+</tr>
+<tr>
+<td>Collision Detection</td>
+<td>碰撞检测模式，discrete：大部分情况下使用不连续的模式</td>
+</tr>
+<tr>
+<td>Constraints</td>
+<td>用来控制锁定。Freeze Position：锁定坐标；Freeze Rotation：锁定旋转</td>
+</tr>
+</tbody>
+</table>
+<h2 id="控制小球"><a href="#控制小球" class="headerlink" title="控制小球"></a>控制小球</h2><p>创建C#脚本，不要忘记了附加给小球，AddComponent里面就有~</p>
+<a id="more"></a>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Player</span> : <span class="title">MonoBehaviour</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> Rigidbody rigid; <span class="comment">// ball</span></span><br><span class="line">    <span class="keyword">private</span> Vector3 dir;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">float</span> force = <span class="number">5f</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">float</span> torque = <span class="number">10f</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">bool</span> brake;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> spin;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Start is called before the first frame update</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">        rigid = GetComponent&lt;Rigidbody&gt;();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Update is called once per frame</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">        dir = <span class="keyword">new</span> Vector3(Input.GetAxis(<span class="string">"Horizontal"</span>), <span class="number">0</span>, Input.GetAxis(<span class="string">"Vertical"</span>));</span><br><span class="line">        brake = Input.GetKey(KeyCode.Space);</span><br><span class="line">        <span class="keyword">if</span> (Input.GetKey(KeyCode.Q))</span><br><span class="line">            spin = <span class="number">-1</span>; <span class="comment">//anti-clockwise</span></span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (Input.GetKey(KeyCode.E))</span><br><span class="line">            spin = <span class="number">1</span>; <span class="comment">// closkwise</span></span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            spin = <span class="number">0</span>; <span class="comment">// no rotation</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">FixedUpdate</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (!brake) &#123;</span><br><span class="line">            rigid.AddForce(dir * force, ForceMode.Force);</span><br><span class="line">            rigid.AddTorque(Vector3.up * spin * torque);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            rigid.velocity = Vector3.Lerp(rigid.velocity, <span class="keyword">new</span> Vector3(<span class="number">0</span>, rigid.velocity.y, <span class="number">0</span>), <span class="number">0.2f</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="摄像头追随"><a href="#摄像头追随" class="headerlink" title="摄像头追随"></a>摄像头追随</h2><p>需要给Main Camera附加脚本<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">CameraTrace</span> : <span class="title">MonoBehaviour</span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Transform trans;</span><br><span class="line">    <span class="keyword">public</span> Transform target;</span><br><span class="line">    <span class="keyword">public</span> Vector3 distance = <span class="keyword">new</span> Vector3(<span class="number">0</span>, <span class="number">2</span>, <span class="number">-5</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Start is called before the first frame update</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">        trans = <span class="keyword">this</span>.transform;</span><br><span class="line">        target = GameObject.Find(<span class="string">"Ball"</span>).GetComponent&lt;Transform&gt;();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Update is called once per frame</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">        trans.position = target.position + distance;</span><br><span class="line">        trans.LookAt(target);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="GameObject脚本操作"><a href="#GameObject脚本操作" class="headerlink" title="GameObject脚本操作"></a>GameObject脚本操作</h2><p>GameObject本身没有功能，是Unity场景里所有组件的基类，很多时候需要在脚本中操作GameObject</p>
+<table>
+<thead>
+<tr>
+<th>成员变量</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>activeInHierarchy</td>
+<td>场景中的游戏对象是否激活？</td>
+</tr>
+<tr>
+<td>activeSelf</td>
+<td>该游戏对象的局部激活状态。（只读）</td>
+</tr>
+<tr>
+<td>isStatic</td>
+<td>如果一个游戏对象是静态仅在编辑器API指定。</td>
+</tr>
+<tr>
+<td>layer</td>
+<td>游戏对象所在的层，层的范围是在[0…31]之间。</td>
+</tr>
+<tr>
+<td>scene</td>
+<td>场景物体。</td>
+</tr>
+<tr>
+<td>tag</td>
+<td>这个游戏对象的标签。</td>
+</tr>
+<tr>
+<td>transform</td>
+<td>附加于这个游戏对象上的变换。(如果没有则为空)</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>成员函数</th>
+<th>使用方法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AddComponent</td>
+<td>添加一个名称为className的组件到游戏对象。</td>
+</tr>
+<tr>
+<td>BroadcastMessage</td>
+<td>对此游戏对象及其子对象的所有MonoBehaviour中调用名称为methodName的方法。</td>
+</tr>
+<tr>
+<td>CompareTag</td>
+<td>此游戏对象是否被标记为tag标签？</td>
+</tr>
+<tr>
+<td>GetComponent</td>
+<td>如果这个游戏对象附件了一个类型为type的组件，则返回该组件，否则为空。</td>
+</tr>
+<tr>
+<td>GetComponentInChildren</td>
+<td>返回此游戏对象或者它的所有子对象上(深度优先)的类型为type的组件。</td>
+</tr>
+<tr>
+<td>GetComponentInParent</td>
+<td>从父对象查找组件。</td>
+</tr>
+<tr>
+<td>GetComponents</td>
+<td>返回该游戏对象所有type类型的组件列表。</td>
+</tr>
+<tr>
+<td>GetComponentsInChildren</td>
+<td>返回此游戏对象与其子对象所有type类型的组件。</td>
+</tr>
+<tr>
+<td>GetComponentsInParent</td>
+<td>返回此游戏对象与其父对象所有type类型的组件。</td>
+</tr>
+<tr>
+<td>SampleAnimation</td>
+<td>用于任何动画剪辑在给定的时间采样动画。</td>
+</tr>
+<tr>
+<td>SendMessage</td>
+<td>在这个游戏物体上的所有MonoBehaviour上调用名称为methodName的方法。</td>
+</tr>
+<tr>
+<td>SendMessageUpwards</td>
+<td>在这个游戏物体及其祖先物体的所有MonoBehaviour中调用名称为methodName的方法。</td>
+</tr>
+<tr>
+<td>SetActive</td>
+<td>激活/停用此游戏对象。</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>静态函数</th>
+<th>使用方法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CreatePrimitive</td>
+<td>创建一个带有原型网格渲染器和适当的碰撞器的游戏对象。</td>
+</tr>
+<tr>
+<td>Find</td>
+<td>找到并返回一个名字为name的游戏物体。</td>
+</tr>
+<tr>
+<td>FindGameObjectsWithTag</td>
+<td>返回具体tag标签的激活的游戏对象列表，如果没有找到则为空。</td>
+</tr>
+<tr>
+<td>FindWithTag</td>
+<td>返回标记为tag的一个游戏对象，如果没有找到对象则为空。</td>
+</tr>
+</tbody>
+</table>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><p><a href="https://www.imooc.com/learn/1028" target="_blank" rel="noopener">Unity 3D 刚体实现平衡球游戏</a><br><a href="https://blog.csdn.net/qwe25878/article/details/86481920" target="_blank" rel="noopener">人人都能写游戏系列（三）Unity 3D平衡球游戏</a><br><a href="https://www.cnblogs.com/forever-Ys/p/10556147.html" target="_blank" rel="noopener">U3D GameObject 解读</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/zztttt.github.io/tags/csharp/" rel="tag"># csharp</a>
+              <a href="/zztttt.github.io/tags/unity/" rel="tag"># unity</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/zztttt.github.io/2020/08/11/unity-gitignore写法/" rel="prev" title="unity: gitignore写法">
+      <i class="fa fa-chevron-left"></i> unity: gitignore写法
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/zztttt.github.io/2020/09/20/Sort-Algorithm/" rel="next" title="Sort Algorithm">
+      Sort Algorithm <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#RigidBody"><span class="nav-number">1.</span> <span class="nav-text">RigidBody</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#控制小球"><span class="nav-number">2.</span> <span class="nav-text">控制小球</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#摄像头追随"><span class="nav-number">3.</span> <span class="nav-text">摄像头追随</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GameObject脚本操作"><span class="nav-number">4.</span> <span class="nav-text">GameObject脚本操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Reference"><span class="nav-number">5.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ZhangZhengtong</p>
+  <div class="site-description" itemprop="description">SE@SJTU</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/zztttt.github.io/archives/">
+        
+          <span class="site-state-item-count">32</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/zztttt.github.io/categories/">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/zztttt.github.io/tags/">
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZhangZhengtong</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/zztttt.github.io/lib/anime.min.js"></script>
+  <script src="/zztttt.github.io/lib/velocity/velocity.min.js"></script>
+  <script src="/zztttt.github.io/lib/velocity/velocity.ui.min.js"></script>
+<script src="/zztttt.github.io/js/utils.js"></script><script src="/zztttt.github.io/js/motion.js"></script>
+<script src="/zztttt.github.io/js/schemes/muse.js"></script>
+<script src="/zztttt.github.io/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.8.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/zztttt.github.io/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/zztttt.github.io/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/zztttt.github.io/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/zztttt.github.io/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/zztttt.github.io/css/main.css">
+
+
+<link rel="stylesheet" href="/zztttt.github.io/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"github.com","root":"/zztttt.github.io/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="Overview">
+<meta name="keywords" content="algorithm">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Sort Algorithm">
+<meta property="og:url" content="http://github.com/2020/09/20/Sort-Algorithm/index.html">
+<meta property="og:site_name" content="zztttt">
+<meta property="og:description" content="Overview">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://zztttt.cn/picture/sort/sort.jpg">
+<meta property="og:updated_time" content="2022-08-13T10:01:38.570Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Sort Algorithm">
+<meta name="twitter:description" content="Overview">
+<meta name="twitter:image" content="https://zztttt.cn/picture/sort/sort.jpg">
+
+<link rel="canonical" href="http://github.com/2020/09/20/Sort-Algorithm/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Sort Algorithm | zztttt</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/zztttt.github.io/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">zztttt</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/zztttt.github.io/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/zztttt.github.io/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope="" itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://github.com/2020/09/20/Sort-Algorithm/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/zztttt.github.io/images/avatar.gif">
+      <meta itemprop="name" content="ZhangZhengtong">
+      <meta itemprop="description" content="SE@SJTU">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="zztttt">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Sort Algorithm
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-09-20 18:05:43" itemprop="dateCreated datePublished" datetime="2020-09-20T18:05:43+08:00">2020-09-20</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-08-13 18:01:38" itemprop="dateModified" datetime="2022-08-13T18:01:38+08:00">2022-08-13</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/zztttt.github.io/categories/zztttt/" itemprop="url" rel="index"><span itemprop="name">zztttt</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/zztttt.github.io/categories/interview/" itemprop="url" rel="index"><span itemprop="name">interview</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h1><p><img src="https://zztttt.cn/picture/sort/sort.jpg" alt="sort"></p>
+<a id="more"></a>
+<h1 id="quick-sort"><a href="#quick-sort" class="headerlink" title="quick sort"></a>quick sort</h1><p>通过一趟排序将要排序的数据分割成独立的两部分，其中一部分的所有数据都比另外一部分的所有数据都要小，然后再按此方法对这两部分数据分别进行快速排序，整个排序过程可以递归进行，以此达到整个数据变成有序序列。<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">quickSortBase</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; v, <span class="keyword">int</span> low, <span class="keyword">int</span> high)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (low &gt;= high) <span class="keyword">return</span>;</span><br><span class="line">	<span class="keyword">int</span> key = v[low], start = low, end = high;</span><br><span class="line">	<span class="keyword">while</span> (start &lt; end) &#123;</span><br><span class="line">		<span class="comment">//find element smaller than key, break when v[end] &lt; key, choose end</span></span><br><span class="line">		<span class="keyword">while</span> (start &lt; end &amp;&amp; v[end] &gt;= key)</span><br><span class="line">			end--;</span><br><span class="line">		v[start] = v[end];</span><br><span class="line">		<span class="comment">//find element bigger than key, break when v[start] &gt; key, choose start</span></span><br><span class="line">		<span class="keyword">while</span> (start &lt; end &amp;&amp; v[start] &lt;= key)</span><br><span class="line">			start++;</span><br><span class="line">		v[end] = v[start];</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">//store key in suitable position</span></span><br><span class="line">	v[start] = key;</span><br><span class="line">	quickSortBase(v, low, start - <span class="number">1</span>);</span><br><span class="line">	quickSortBase(v, start + <span class="number">1</span>, high);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">quickSort</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; v)</span> </span>&#123;</span><br><span class="line">	quickSortBase(v, <span class="number">0</span>, v.size() - <span class="number">1</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="优化"><a href="#优化" class="headerlink" title="优化"></a>优化</h2><ul>
+<li>当数列近乎有序的时，由于每次选取的都是第一个数，所以造成数列分割的极其不等，此时快排蜕化成 <code>O(n^2)</code> 的算法， 此时只要随机选取基准点即可</li>
+<li>当数列中包含大量的重复元素的时候，这一版的代码也会造成”分割不等“的问题，此时需要将重复元素均匀的分散的自数列旁</li>
+<li>使用<strong>三路快排</strong></li>
+</ul>
+<h1 id="bubble-sort"><a href="#bubble-sort" class="headerlink" title="bubble sort"></a>bubble sort</h1><p>对一个数组进行多次遍历，比较相邻的两项，如果顺序错了则交换。每次遍历，都会有最大项放在了正确的位置。<br>假如有n个元素，进行升序排序，则第一轮要进行n-1次比较，然后最大的数放在最后，然后对前面n-1个元素进行第二次遍历，进行n-2次比较，其中最大的放在倒数第二个位置。<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">bubbleSort</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; v)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">int</span> len = v.size();</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = len - <span class="number">1</span>; i &gt;= <span class="number">0</span>; --i) &#123;</span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt;= i - <span class="number">1</span>; ++j) &#123;</span><br><span class="line">			<span class="keyword">if</span> (v[j] &gt; v[j + <span class="number">1</span>]) &#123;</span><br><span class="line">				<span class="comment">// swap</span></span><br><span class="line">				<span class="keyword">int</span> tmp = v[j + <span class="number">1</span>];</span><br><span class="line">				v[j + <span class="number">1</span>] = v[j];</span><br><span class="line">				v[j] = tmp;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="优化-1"><a href="#优化-1" class="headerlink" title="优化"></a>优化</h2><p>因为冒泡排序必须要在最终位置找到之前不断交换数据项，所以它经常被认为是最低效的排 序方法。这些 “浪费式” 的交换操作消耗了许多时间。但是，由于冒泡排序要遍历整个未排好的 部分，它可以做一些大多数排序方法做不到的事。尤其是如果在整个排序过程中没有交换，我们就可断定列表已经排好。因此可改良冒泡排序，使其在已知列表排好的情况下<strong>提前结束</strong>。<br>如果一个列表只需要几次遍历就可排好，冒泡排序就占有优势<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">bubbleSort</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; v)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">int</span> len = v.size();</span><br><span class="line">	<span class="keyword">bool</span> isExchanged = <span class="literal">false</span>;</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = len - <span class="number">1</span>; i &gt;= <span class="number">0</span>; --i) &#123;</span><br><span class="line">		isExchanged = <span class="literal">false</span>;</span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt;= i - <span class="number">1</span>; ++j) &#123;</span><br><span class="line">			<span class="keyword">if</span> (v[j] &gt; v[j + <span class="number">1</span>]) &#123;</span><br><span class="line">				<span class="keyword">int</span> tmp = v[j + <span class="number">1</span>];</span><br><span class="line">				v[j + <span class="number">1</span>] = v[j];</span><br><span class="line">				v[j] = tmp;</span><br><span class="line">				isExchanged = <span class="literal">true</span>;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">if</span> (!isExchanged)</span><br><span class="line">			<span class="keyword">return</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="select-sort"><a href="#select-sort" class="headerlink" title="select sort"></a>select sort</h1><p>选择排序提高了冒泡排序的性能，它每遍历一次列表<strong>只交换一次</strong>数据，即进行一次遍历时找到最大的项，完成遍历后，再把它换到正确的位置。<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">selectSort</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; v)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">int</span> len = v.size();</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = len - <span class="number">1</span>; i &gt;= <span class="number">0</span>; --i) &#123;</span><br><span class="line">		<span class="keyword">int</span> maxPos = <span class="number">0</span>;</span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt;= i; ++j) &#123;</span><br><span class="line">			<span class="keyword">if</span> (v[j] &gt; v[maxPos]) &#123;</span><br><span class="line">				maxPos = j;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">// swap</span></span><br><span class="line">		<span class="keyword">int</span> tmp = v[i];</span><br><span class="line">		v[i] = v[maxPos];</span><br><span class="line">		v[maxPos] = tmp;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="insert-sort"><a href="#insert-sort" class="headerlink" title="insert sort"></a>insert sort</h1><p>它总是保持一个位置靠前的已排好的子数组，然后每一个新的数据项被 “插入” 到前边的子数组里，排好的子数组增加一项。<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">insertSortBase</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; v, <span class="keyword">int</span> low, <span class="keyword">int</span> high)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (low &gt;= high)</span><br><span class="line">		<span class="keyword">return</span>;</span><br><span class="line">	<span class="built_in">cout</span> &lt;&lt; <span class="string">"start:"</span> &lt;&lt; low &lt;&lt; <span class="string">", end:"</span> &lt;&lt; high &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = low + <span class="number">1</span>; i &lt;= high; ++i) &#123;</span><br><span class="line">		<span class="keyword">int</span> cur = v[i];</span><br><span class="line">		<span class="keyword">int</span> j = i - <span class="number">1</span>;</span><br><span class="line">		<span class="keyword">for</span> (; j &gt;= low; --j) &#123;</span><br><span class="line">			<span class="keyword">if</span> (v[j] &gt; cur) &#123;</span><br><span class="line">				v[j + <span class="number">1</span>] = v[j];</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">else</span> &#123;</span><br><span class="line">				v[j + <span class="number">1</span>] = cur;</span><br><span class="line">				<span class="keyword">break</span>;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">// corner case</span></span><br><span class="line">		<span class="keyword">if</span> (j + <span class="number">1</span> == low)</span><br><span class="line">			v[low] = cur;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">insertSort</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; v)</span> </span>&#123;</span><br><span class="line">	insertSortBase(v, <span class="number">0</span>, v.size() - <span class="number">1</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="shell-sort"><a href="#shell-sort" class="headerlink" title="shell sort"></a>shell sort</h1><p>是优化版的插入排序，核心思想是把把每间隔为gap的所有元素选出来组成子数组，然后对每个子数组进行插入排序，最后当 gap = 1 时，对整体进行一次直接插入排序<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">gapInsertSort</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; v, <span class="keyword">int</span> start, <span class="keyword">int</span> gap)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">int</span> len = v.size();</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = start + gap; i &lt; len; i += gap) &#123;</span><br><span class="line">		<span class="keyword">int</span> cur = v[i];</span><br><span class="line">		<span class="keyword">int</span> j = i - gap;</span><br><span class="line">		<span class="keyword">for</span> (; j &gt;= start; j = j - gap) &#123;</span><br><span class="line">			<span class="keyword">if</span> (v[j] &gt; cur) &#123;</span><br><span class="line">				v[j + gap] = v[j];</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">else</span> &#123;</span><br><span class="line">				v[j + gap] = cur;</span><br><span class="line">				<span class="keyword">break</span>;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">// corner case</span></span><br><span class="line">		<span class="keyword">if</span> (j + gap == start)</span><br><span class="line">			v[start] = cur;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">shellSort</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; v)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">int</span> len = v.size();</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> gap = len / <span class="number">2</span>; gap &gt; <span class="number">0</span>; gap = gap / <span class="number">2</span>) &#123;</span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; gap; ++i) &#123;</span><br><span class="line">			gapInsertSort(v, i, gap);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="merge-sort"><a href="#merge-sort" class="headerlink" title="merge sort"></a>merge sort</h1><p>归并排序是一种递归算法，它持续地将一个列表分成两半。如果列表是空的或者 只有一个元素，那么根据定义，它就被排序好了（最基本的情况）。如果列表里的元素超过一个，我们就把列表拆分，然后分别对两个部分调用递归排序。有自顶向下（递归法）和自底向上的两种实现方法<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; merge(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; v1, <span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; v2) &#123;</span><br><span class="line">	<span class="keyword">int</span> len1 = v1.size(), len2 = v2.size(), p1 = <span class="number">0</span>, p2 = <span class="number">0</span>;</span><br><span class="line">	<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; ret;</span><br><span class="line">	<span class="keyword">while</span> (p1 &lt; len1 &amp;&amp; p2 &lt; len2) &#123;</span><br><span class="line">		<span class="keyword">int</span> a = v1[p1], b = v2[p2];</span><br><span class="line">		<span class="keyword">if</span> (a &lt;= b) &#123;</span><br><span class="line">			ret.push_back(a);</span><br><span class="line">			p1++;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">else</span> &#123;</span><br><span class="line">			ret.push_back(b);</span><br><span class="line">			p2++;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">for</span> (; p1 &lt; len1; p1++) &#123;</span><br><span class="line">		ret.push_back(v1[p1]);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">for</span> (; p2 &lt; len2; p2++) &#123;</span><br><span class="line">		ret.push_back(v2[p2]);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> ret;</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; mergeSortBase(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; v, <span class="keyword">int</span> low, <span class="keyword">int</span> high) &#123;</span><br><span class="line">	<span class="keyword">if</span> (low &gt; high)</span><br><span class="line">		<span class="keyword">return</span> &#123;&#125;;</span><br><span class="line">	<span class="keyword">if</span> (low == high)</span><br><span class="line">		<span class="keyword">return</span> <span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;(<span class="number">1</span>, v[low]);</span><br><span class="line">	<span class="keyword">int</span> mid = (low + high) / <span class="number">2</span>;</span><br><span class="line">	<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; left = mergeSortBase(v, low, mid);</span><br><span class="line">	<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; right = mergeSortBase(v, mid + <span class="number">1</span>, high);</span><br><span class="line">	<span class="keyword">return</span> merge(left, right);</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; mergeSort(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; v) &#123;</span><br><span class="line">	<span class="keyword">return</span> mergeSortBase(v, <span class="number">0</span>, v.size() - <span class="number">1</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="test-case"><a href="#test-case" class="headerlink" title="test case"></a>test case</h1><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; src;</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10000</span>; ++i) &#123;</span><br><span class="line">		src.push_back(rand());</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; dst(src);</span><br><span class="line"></span><br><span class="line">	sort(src.begin(), src.end());</span><br><span class="line">	<span class="comment">// YourSortFunction(dst); </span></span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10000</span>; ++i) &#123;</span><br><span class="line">		<span class="keyword">if</span> (src[i] != dst[i]) &#123;</span><br><span class="line">			<span class="built_in">cout</span> &lt;&lt; <span class="string">"false"</span> &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">			<span class="built_in">cout</span> &lt;&lt; <span class="string">"i:"</span> &lt;&lt; i &lt;&lt; <span class="string">", src:"</span> &lt;&lt; src[i] &lt;&lt; <span class="string">", dst:"</span> &lt;&lt; dst[i];</span><br><span class="line">			<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">cout</span> &lt;&lt; <span class="string">"true"</span>;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><p><a href="https://zhuanlan.zhihu.com/p/40695917" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/40695917</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/zztttt.github.io/tags/algorithm/" rel="tag"># algorithm</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/zztttt.github.io/2020/08/12/unity-Cube/" rel="prev" title="unity: 平衡球">
+      <i class="fa fa-chevron-left"></i> unity: 平衡球
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/zztttt.github.io/2020/10/01/java-jvm/" rel="next" title="java: jvm">
+      java: jvm <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Overview"><span class="nav-number">1.</span> <span class="nav-text">Overview</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#quick-sort"><span class="nav-number">2.</span> <span class="nav-text">quick sort</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#优化"><span class="nav-number">2.1.</span> <span class="nav-text">优化</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#bubble-sort"><span class="nav-number">3.</span> <span class="nav-text">bubble sort</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#优化-1"><span class="nav-number">3.1.</span> <span class="nav-text">优化</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#select-sort"><span class="nav-number">4.</span> <span class="nav-text">select sort</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#insert-sort"><span class="nav-number">5.</span> <span class="nav-text">insert sort</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#shell-sort"><span class="nav-number">6.</span> <span class="nav-text">shell sort</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#merge-sort"><span class="nav-number">7.</span> <span class="nav-text">merge sort</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#test-case"><span class="nav-number">8.</span> <span class="nav-text">test case</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reference"><span class="nav-number">9.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ZhangZhengtong</p>
+  <div class="site-description" itemprop="description">SE@SJTU</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/zztttt.github.io/archives/">
+        
+          <span class="site-state-item-count">32</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/zztttt.github.io/categories/">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/zztttt.github.io/tags/">
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZhangZhengtong</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/zztttt.github.io/lib/anime.min.js"></script>
+  <script src="/zztttt.github.io/lib/velocity/velocity.min.js"></script>
+  <script src="/zztttt.github.io/lib/velocity/velocity.ui.min.js"></script>
+<script src="/zztttt.github.io/js/utils.js"></script><script src="/zztttt.github.io/js/motion.js"></script>
+<script src="/zztttt.github.io/js/schemes/muse.js"></script>
+<script src="/zztttt.github.io/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

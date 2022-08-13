@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.8.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/zztttt.github.io/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/zztttt.github.io/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/zztttt.github.io/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/zztttt.github.io/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/zztttt.github.io/css/main.css">
+
+
+<link rel="stylesheet" href="/zztttt.github.io/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"github.com","root":"/zztttt.github.io/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="Overview考试周结束，放松（摸鱼）了一个星期，带着负罪感做点正事…首先是两门高度相似的专业课出分了，一门浑水摸鱼的课（Computer System Design and Implementation）拿了A，另外一门复习得很认真的课（Advanced Distributed System）却拿了个B…嗯对，这篇文章就是对这门拿B的课的一个小结。 虽然很无奈，但是这也许就是有心栽花花不开吧~">
+<meta name="keywords" content="operating system">
+<meta property="og:type" content="article">
+<meta property="og:title" content="并行与分布式系统">
+<meta property="og:url" content="http://github.com/2021/07/01/并行与分布式系统/index.html">
+<meta property="og:site_name" content="zztttt">
+<meta property="og:description" content="Overview考试周结束，放松（摸鱼）了一个星期，带着负罪感做点正事…首先是两门高度相似的专业课出分了，一门浑水摸鱼的课（Computer System Design and Implementation）拿了A，另外一门复习得很认真的课（Advanced Distributed System）却拿了个B…嗯对，这篇文章就是对这门拿B的课的一个小结。 虽然很无奈，但是这也许就是有心栽花花不开吧~">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2022-08-13T10:01:38.570Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="并行与分布式系统">
+<meta name="twitter:description" content="Overview考试周结束，放松（摸鱼）了一个星期，带着负罪感做点正事…首先是两门高度相似的专业课出分了，一门浑水摸鱼的课（Computer System Design and Implementation）拿了A，另外一门复习得很认真的课（Advanced Distributed System）却拿了个B…嗯对，这篇文章就是对这门拿B的课的一个小结。 虽然很无奈，但是这也许就是有心栽花花不开吧~">
+
+<link rel="canonical" href="http://github.com/2021/07/01/并行与分布式系统/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>并行与分布式系统 | zztttt</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/zztttt.github.io/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">zztttt</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/zztttt.github.io/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/zztttt.github.io/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope="" itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://github.com/2021/07/01/并行与分布式系统/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/zztttt.github.io/images/avatar.gif">
+      <meta itemprop="name" content="ZhangZhengtong">
+      <meta itemprop="description" content="SE@SJTU">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="zztttt">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          并行与分布式系统
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-07-01 12:28:45" itemprop="dateCreated datePublished" datetime="2021-07-01T12:28:45+08:00">2021-07-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-08-13 18:01:38" itemprop="dateModified" datetime="2022-08-13T18:01:38+08:00">2022-08-13</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h2><p>考试周结束，放松（摸鱼）了一个星期，带着负罪感做点正事…首先是两门高度相似的专业课出分了，一门浑水摸鱼的课（Computer System Design and Implementation）拿了A，另外一门复习得很认真的课（Advanced Distributed System）却拿了个B…嗯对，这篇文章就是对这门拿B的课的一个小结。</p>
+<p>虽然很无奈，但是这也许就是有心栽花花不开吧~</p>
+<h2 id="Contents"><a href="#Contents" class="headerlink" title="Contents"></a>Contents</h2><p>并行（parallel）与分布式（distributed）的区别？当我们一定要对此做区分的时候，一般从两个角度来看：</p>
+<ol>
+<li>数据通讯方式：并行是shared memory，分布式需要通过网络</li>
+<li>时间：并行是shared memory，分布式需要通过网络</li>
+<li>failure 模型：并行是all-or-nothing的，分布式存在partial failure</li>
+</ol>
+<p>从以下这些角度去看待分布式系统</p>
+<ul>
+<li>consistency in distributed system</li>
+<li>crash recovery &amp; logging</li>
+<li>concurrency control<ul>
+<li>two phase lock &amp; snapshot isolation</li>
+</ul>
+</li>
+<li>consensus<ul>
+<li>two phase commit</li>
+<li>paxos</li>
+</ul>
+</li>
+<li>distributed file system<ul>
+<li>NFS</li>
+<li>GFS</li>
+<li>Chubby ?</li>
+</ul>
+</li>
+<li>data-parallel programming<ul>
+<li>MapReduce</li>
+<li>dryad</li>
+</ul>
+</li>
+<li>graph computing<ul>
+<li>Pregel &amp; GraphLab</li>
+<li>PowerLyra &amp; BiGraph</li>
+<li>GraphChi</li>
+</ul>
+</li>
+<li>multicore &amp; NUMA: phoenix &amp; TMR</li>
+<li>Improving in-memory Computing with New Hardware Features</li>
+</ul>
+<a id="more"></a>
+<h2 id="Consistency-in-Distributed-System"><a href="#Consistency-in-Distributed-System" class="headerlink" title="Consistency in Distributed System"></a>Consistency in Distributed System</h2><p>consistency是一个被滥用的词，在database和distributed system 中都有设计，但是可能是完全不同的概念，一般有这些含义：consensus、consistent model、consistent database、serializable、cache coherence</p>
+<p>consistency in distributed system指的是其中的<strong>consistent model</strong>。一个分布式系统往往会有很多进程，以分布式数据库为例，在时刻$t$，client A把X由3更新到4，之后在时刻$t^`$，client A和client B分别询问两个不同的replica关于X的值，可能得到两个不同的答案（3 or 4），困惑就产生了。我们的初衷是不管这个分布式数据库内部是如何实现的，但是对外提供了一个假象：X只有单一的副本，这就是一个单机的数据库！</p>
+<blockquote>
+<p>Consistency determines what responses are acceptable following an update of a replica. </p>
+<p>Which shared memory behaviors are allowed—so that programmers know what to expect and implementors know the limits to what they can provide.</p>
+</blockquote>
+<p>没有对的或者错的consistency model，它是ease of programmability 和 efficiency之间的tradeoff。在分布式系统中的难点在于</p>
+<ol>
+<li>data replication（caching）</li>
+<li>concurrency（no shared clock）</li>
+<li>failure（machine or network）</li>
+</ol>
+<h3 id="Strict-Consistency"><a href="#Strict-Consistency" class="headerlink" title="Strict Consistency"></a>Strict Consistency</h3><p>它是最严格的模型，所有的replica都在一瞬间、全部更新X完成。当然这在现实中是不可能的。当某个数据项（X）发生变化后，不同的 client （client A 和 B）在紧随其后的任意时刻，看到的 X 都是一样的、都是新值。</p>
+<blockquote>
+<p>If one of the processes executes x ≔ 5 at real time t and this is the latest write operation, then at a real time t′ &gt; t, every process trying to read x will receive the value 5.</p>
+</blockquote>
+<p>我们定义分布式系统中的一个操作排列叫history，如果没有overlap则是sequential history，否则是concurrent history</p>
+<h3 id="Linearizability"><a href="#Linearizability" class="headerlink" title="Linearizability"></a>Linearizability</h3><p>相比strict consistency弱一些，不要求write是瞬间完成的，比如数据库使用同步赋值，write需要一些时间才能完成，但是对于系统的要求依然如strict consistency，和其的区别在于：write 需要时间，但 X 值的改变在时长内的某个瞬间发生。</p>
+<p>最简洁的定义为：对于history$H_1$，如果存在一个sequential history$H_2$与$H_1$等价，则称$H_1$满足linearizability</p>
+<h3 id="Sequential-Consistency"><a href="#Sequential-Consistency" class="headerlink" title="Sequential Consistency"></a>Sequential Consistency</h3><p>在linearizability的基础上再放松一点，everyone sees same read/write order.  strict consistency是不现实的，因为没有<strong>global wall-clock</strong>，所以使用了total order of ops来替代。注意！sequential consistency是strict的一个特例。即用timestamp来表示total order</p>
+<p>consistency rules：</p>
+<ol>
+<li>each CPUS’ ops appears in order</li>
+<li>All CPUs see results according to total order(ie. reads see most recent writes)</li>
+</ol>
+<h3 id="Release-Consistency"><a href="#Release-Consistency" class="headerlink" title="Release Consistency"></a>Release Consistency</h3><p>其实就是lock consistency。</p>
+<p>为什么需要它呢？因为sequential consistency有很多问题：</p>
+<ol>
+<li>false sharing. 两个变量在同一个page，两个Node分别RW各自的变量-&gt;pingpong. 最早出现在cache中，只是粒度是cache line，不过本质是一样的</li>
+<li>解决方法：编译时把两个变量放在不同的page，但是会导致占用的内存和传输大小变大</li>
+<li>真正的解决方法：twin+diff，记录page的增量修改。 sending a diff is cheaper.</li>
+</ol>
+<p>update protocol VS invalidate protocol:</p>
+<blockquote>
+<p>modification/invalidation of modification, Invalidations are smaller than the updates, In invalidate-base protocol, there can be significant overhead due to access misses</p>
+</blockquote>
+<h3 id="Eventual-Consistency"><a href="#Eventual-Consistency" class="headerlink" title="Eventual Consistency"></a>Eventual Consistency</h3><p>sequential：pessimistic conflict handling</p>
+<ul>
+<li>conflicting writes is common case</li>
+<li>Updates cannot take effect unless they are serialized first</li>
+</ul>
+<p>eventual：optimistic conflict handling</p>
+<ul>
+<li>Conflicting writes is rare case</li>
+<li>Let updates happen, worry about whether they can be serialized later</li>
+</ul>
+<p>为了更好的performance！之前的缺点是性能低下，需要全局同步，从可用性来讲，节点中只要有人断开或partition就会一直block，于是eventual consistency支持disconnected操作，存在可能的应用程序异常行为（陈旧读，冲突写）。</p>
+<p>解决方案是 Update Function：</p>
+<blockquote>
+<p>Have update be a function, not a new value. Read current state of storage, decide best change. Function must be deterministic, Otherwise nodes will get different answers.</p>
+</blockquote>
+<p>如何让每个节点的 update order 达成一致呢？不能用一个全局顺序，否则回退到 sequential consistency，发送操作时携带 update ID = time + node ID， 把本机更新该执行操作的时候的时间记录下来，然每个机器的时间会不一样，仅用这个时间来确定 所有（本机和其他）执行的 update order 是可行的。称为 Rollback &amp; Replay. </p>
+<h4 id="Challenge-of-Clock-Time-物理时钟和逻辑时钟（Lamport时钟）"><a href="#Challenge-of-Clock-Time-物理时钟和逻辑时钟（Lamport时钟）" class="headerlink" title="Challenge of Clock Time: 物理时钟和逻辑时钟（Lamport时钟）"></a>Challenge of Clock Time: 物理时钟和逻辑时钟（Lamport时钟）</h4><p>简单来讲就是同步状态时可能破坏因果依赖。某台机器的 timestamp 很小 = 7，在看到其他大 timestamp = 10 的 add 操作 后执行了删除，会导致同步操作是 先 delete 后add，在发操作进行 sync 同步的时候，同时去修改本地时间 max(自己的本地时间，看到的其他机器执行时间 + 1)</p>
+<p>logical clock： T = Max(T, T’+1)</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">De-centralized</th>
+<th>Centralized</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">连续 ID</td>
+<td>加入 CSN，安排一个节点比其他节点多一个操作，添加 CSN 称为 final time，再发给别人</td>
+</tr>
+<tr>
+<td style="text-align:center">但是要是 前面 ID 的一直没来就会卡着，出现网络 failure 就凉了</td>
+<td>在比较时，有 CSN 的 操作优先，所有人同步到有 CSN 的机器视角</td>
+</tr>
+<tr>
+<td style="text-align:center">不能保证所有节点的最终状态一致，不能把慢的消息去掉或者赶到前面去</td>
+<td>系统性能会不会卡在 CSN 这呢？还行，因为系统正常执行是高效的，状态同步可以认为是 offline 的，影响最终确定状态的性能</td>
+</tr>
+</tbody>
+</table>
+<h3 id="Casual-Consistency"><a href="#Casual-Consistency" class="headerlink" title="Casual Consistency"></a>Casual Consistency</h3><p>一篇论文：COPS: Scalable Causal Consistency for Wide-Area Storage</p>
+<p>不是提出了 casual consistency，而是关注数据量大，分布广下的场景，关注 casual consistency 的可扩展性。</p>
+<p>一台机器不能保存所有数据了，不同机器间对操作的 log 如何确定顺序，不同机器间的数据可能存在依赖关系，如何维护？</p>
+<p>如何维护：</p>
+<ul>
+<li>Bayou系统里在最终状态更新的时候，使用 log 来 replay 其他机器的操作，最后会把操作线性执行，影响 scalability</li>
+<li>COPS 希望提高并行性，显式记录每个操作的因果依赖，无依赖的操作无需线性</li>
+<li>dependency 会成为瓶颈吗？<ul>
+<li>会越来越多</li>
+<li>不会，dependency 是树的形式，可以剪枝，实际上仅依赖有一条</li>
+<li>这个依赖满足，这个之前的一定也满足</li>
+</ul>
+</li>
+</ul>
+<h2 id="Crash-Recovery-amp-Logging"><a href="#Crash-Recovery-amp-Logging" class="headerlink" title="Crash Recovery &amp; Logging"></a>Crash Recovery &amp; Logging</h2><h3 id="为什么要crash-recovery？"><a href="#为什么要crash-recovery？" class="headerlink" title="为什么要crash recovery？"></a>为什么要crash recovery？</h3><p>crash recovery 指的是数据库事务非正常退出（kill -9 pid），这回导致磁盘上的page状态与redo log的内容不一致，因为buffer pool中的page是异步刷入磁盘的，这就需要我们在机器crash recovery时将两者恢复到一致的状态。<strong>All or Nothing</strong>！</p>
+<p>除了要将磁盘页面恢复到一个一致状态以外，还需要考虑到退出时的活跃事务处理：哪些事务需要提交，哪些事务需要回滚等等，这些也属于crash recovery的工作职责。</p>
+<h3 id="如何crash-recovery？"><a href="#如何crash-recovery？" class="headerlink" title="如何crash recovery？"></a>如何crash recovery？</h3><p>redo log &amp; undo log。redo log指的是将磁盘上的数据页面恢复至最新状态，而回访的起始位点就是实例推出前记录的checkpoint lsn。因为checkpoint lsn保证这之前的redo log对应的page更改一定被持久化了。</p>
+<h3 id="Solution：-Logging"><a href="#Solution：-Logging" class="headerlink" title="Solution： Logging"></a>Solution： Logging</h3><p>logging会记三种。do、undo、redo，在do的时候记录log，用记录的log可以回到old state。</p>
+<p>redo log：用于重做已经commit但是还在buffer里即没有刷入磁盘时，就已经crash，导致recovery时数据不一致，所以需要重做一遍</p>
+<p>undo log：用于撤销没有commit，但是已经从buffer中被刷入磁盘的数据，因为crash意味着该事务abort了，就不应该持久化，所以需要undo</p>
+<h3 id="如何做checkpoint？"><a href="#如何做checkpoint？" class="headerlink" title="如何做checkpoint？"></a>如何做checkpoint？</h3><p>找一个合理的时间点，将之前的 log 全部落盘，把已经 commit txn 的 log 去除，写入ongoing 的 txn 及指向其最近的操作记录指针，atomically 更新 checkpoint root</p>
+<h3 id="如何从checkpoint中recovery？"><a href="#如何从checkpoint中recovery？" class="headerlink" title="如何从checkpoint中recovery？"></a>如何从checkpoint中recovery？</h3><h4 id="UNDO-REDO-logging"><a href="#UNDO-REDO-logging" class="headerlink" title="UNDO-REDO logging"></a>UNDO-REDO logging</h4><ol>
+<li>读 cp，获取 ongoing 的 txn</li>
+<li>读 log，判断 txn 是否 commit，已经 commit 称为 winner，反之称为 loser</li>
+<li>UNDO loser 以去除 cp 之前的 没有 commit txn 的已执行操作</li>
+<li>REDO winner 以恢复cp 之后的已经 commit 的 txn 的未执行操作</li>
+<li>那么 cp 没记录且没有 commit 的 txn 呢？不用管，cp 中没有这个 txn，且没有 commit</li>
+</ol>
+<h4 id="REDO-ONLY-logging"><a href="#REDO-ONLY-logging" class="headerlink" title="REDO-ONLY logging"></a>REDO-ONLY logging</h4><ol>
+<li>在做 cp 的时候，仅仅把已经 commit 的 txn 落盘，而对于 uncommitted 的 txn 不能写磁盘（因为不能 UNDO），但是要在 cp 中记录</li>
+<li>recovery 的时候对于所有 uncommitted 的 txn 都要 REDO</li>
+<li>这种情况下，CMT 标记可以 delay 写，cp 的状态（磁盘的状态）都是 legal 的，而 REDO-UNDO中 磁盘可能出现 illegal 状态，对于 short txn 较好，而对于 long txn 可能需要 REDO 很长一段已经做了的操作</li>
+</ol>
+<h4 id="UNDO-ONLY-logging"><a href="#UNDO-ONLY-logging" class="headerlink" title="UNDO-ONLY logging"></a>UNDO-ONLY logging</h4><p>logging 规则，在写 CMT log 前要把前面的操作都写入操作，因为可以 UNDO，但是不能 REDO，知道这个 txn 的前面的操作都写入了才能写 CMT log</p>
+<h2 id="Concurrency-Control"><a href="#Concurrency-Control" class="headerlink" title="Concurrency Control"></a>Concurrency Control</h2><h3 id="为什么需要concurrency-control？"><a href="#为什么需要concurrency-control？" class="headerlink" title="为什么需要concurrency control？"></a>为什么需要concurrency control？</h3><p>在下层（middle ware，数据库，分布式系统）处解决并发控制问题，能为上层应用提供更好的支持即通用性，但是也更难，获取的信息更少，需要支持的更多。在上层做，应用程序需要负责保护数据隔离，好做，但是难移植，但是对于特殊场景下的问题，在上层做可能较为容易，如对于 Phantom 问题，上层较容易发现，可以有自己的约定来解决。</p>
+<p>下层并发控制希望并发事务 能够 等价到某种串行执行顺序，as if serially，对应的串行执行顺序可以是$ T_1 $先也可以是$T_2$ 先，但是不能四不像。</p>
+<h3 id="事务的ACID"><a href="#事务的ACID" class="headerlink" title="事务的ACID"></a>事务的ACID</h3><ul>
+<li>Atomicity，在 fail时，all-or-nothing</li>
+<li>Consistency，维护状态不变量invariant</li>
+<li>Isolation，并发执行不冲突（interfere）</li>
+<li>Durability，survive failure</li>
+</ul>
+<h3 id="serializability"><a href="#serializability" class="headerlink" title="serializability"></a>serializability</h3><p>理想语义状态，一系列事务的执行可以等价到 serial 顺序</p>
+<p>conflict serializability:  两个schedule是 equivalent 等价的，即这两个调度包含同样的 op，且对于<strong>冲突op</strong>安排了相同的顺序order。</p>
+<p>冲突op意味着：两个op访问同一个数据，至少有一个是write。</p>
+<p>如果某一个 schedule 可以等价到某个 serial schedule，那么该调度就是 serializable</p>
+<h4 id="如何保证-serializable-schedule-呢？"><a href="#如何保证-serializable-schedule-呢？" class="headerlink" title="如何保证 serializable schedule 呢？"></a>如何保证 serializable schedule 呢？</h4><ol>
+<li><p>global lock：正确，但太慢</p>
+</li>
+<li><p>在 R/W X 前拿到 X 对应的 锁，完成R/W后放开，即 short-duration lock</p>
+<p>错误，并没有指定并发事务对于操作的顺序；若有 write 操作，则能读取到 uncommitted value</p>
+</li>
+<li><p>在 W X前拿X的锁，直到事务完成才放开，即 long-duration locks on WRITE</p>
+<p>解决 Dirty Read 的问题；但是出现Non-Repeatable read 问题，重复读可能会有不同的值，显然在 串行执行中不会出现；改进方法是，对于 read 也用 long-duration lock</p>
+</li>
+<li><p><strong>two phase lock</strong></p>
+<ol>
+<li><p>growing 阶段只拿锁，shrinking 阶段只能放锁</p>
+<p>谁拿到第一把冲突锁确定了 <strong>并发执行所等价的串行执行</strong> 的顺序</p>
+</li>
+<li><p>2PL 解决串行化调度的问题，但是会有 死锁</p>
+<ol>
+<li><p>Avoidance，将锁排序，按锁的顺序拿锁，而不是按访问的顺序拿锁</p>
+<p>但是并不是总能知道要拿哪些锁？</p>
+</li>
+<li><p>Detection，探测死锁 cycle，abort 相关事务</p>
+<p>探测可以是主动的（建立事务依赖图），也可以是被动的（timeout到了就abort）abort 的目标选择，abort 哪个好</p>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+<h3 id="隔离级别"><a href="#隔离级别" class="headerlink" title="隔离级别"></a>隔离级别</h3><ul>
+<li><p>read uncommitted</p>
+<ul>
+<li>允许读到uncommitted的值，但是不能写uncommitted value</li>
+<li>读的时候不拿锁，写不变</li>
+</ul>
+</li>
+<li><p>read committed</p>
+<ul>
+<li>读的时候拿锁，但是读完就放掉</li>
+<li>RU 和 RC 规定拿锁的时段</li>
+<li><strong>unrepeatable read</strong><ul>
+<li>读的数据的的内容在一个transaction中前后不一致</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>repeatable read</p>
+<ul>
+<li><p>读的时候拿锁，直到事务结束放掉，但是对于 index 锁（range锁）是读完就放掉</p>
+</li>
+<li><p>RR 规定放锁的范围</p>
+</li>
+<li><p><strong>phantom</strong></p>
+<ul>
+<li><p>读的数据的的<strong>数量</strong>在一个transaction中前后不一致</p>
+</li>
+<li><p>如果有 insert 新数据的操作，会出现 Phantom。因为原有的 lock 只对于本来就有的数据。</p>
+<p>解决方法：谓词锁，predicate locking；对于 B树索引，加range lock；在数据层忽略</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>serializable</p>
+<ul>
+<li>每种读都拿锁，直到事务结束放掉</li>
+</ul>
+</li>
+</ul>
+<h3 id="Multi-Version-Concurrency-Control"><a href="#Multi-Version-Concurrency-Control" class="headerlink" title="Multi Version Concurrency Control"></a>Multi Version Concurrency Control</h3><p>serializable太慢了，怎么办呢？就这么做，容忍可以读到old value</p>
+<ol>
+<li>每个 data item 有多个版本</li>
+<li>在执行过程中缓存write的op</li>
+<li>read时选择合适的版本</li>
+<li>在commit时，系统需要validate现在的状态是否适合使该事务中的W让别人可见</li>
+</ol>
+<h3 id="Snapshot-Isolation"><a href="#Snapshot-Isolation" class="headerlink" title="Snapshot Isolation"></a>Snapshot Isolation</h3><p>这是一种弱于serializability，但是强于repeatable read的一种隔离级别。现在MySQL中虽然说的是repeatable read，但是实际上是snapshot isolation！！！（坑爹）</p>
+<p>rules：</p>
+<ol>
+<li>数据有 snapshot（旧数据），Read 从快照中读。</li>
+<li>Write 进行缓存</li>
+<li>在 Commit 时检查 <strong>Write-Write</strong> 冲突，若有则 abort</li>
+</ol>
+<p>可以发现效率应该较高，只检查 W-W 冲突，检查范围较小，其他事务读取过某数据难以记录及检查。不检查 R-W 冲突，所以仍旧会存在 anomaly （盲写），但是较少</p>
+<h4 id="snapshot-isolation不等于serializability"><a href="#snapshot-isolation不等于serializability" class="headerlink" title="snapshot isolation不等于serializability"></a>snapshot isolation不等于serializability</h4><p>会有<strong>write skew</strong>的问题！$T_1 $读X写Y，$T_2$读Y写X，不可以等价到串行化结果，但是在SI下可以提交。</p>
+<p>解决方法：在协议上，将SI退化，把 Read 也加入到多版本控制集合，在 RW冲突下也 abort；或者在上层应用上解决，上层发现该问题并处理。</p>
+<h4 id="可是什么是serializable-snapshot-isolation？"><a href="#可是什么是serializable-snapshot-isolation？" class="headerlink" title="可是什么是serializable snapshot isolation？"></a>可是什么是serializable snapshot isolation？</h4><p>make snapshot isolation  serializable！</p>
+<h2 id="Consensus"><a href="#Consensus" class="headerlink" title="Consensus"></a>Consensus</h2><h3 id="two-phase-commit"><a href="#two-phase-commit" class="headerlink" title="two phase commit"></a>two phase commit</h3><p>从单个单机操作，到今天是数据在多机上，同时有多个操作。Transaction coordinator 不存储数据，负责分发client 的操作请求，中转 storage server 的数据。</p>
+<p>one phase commit会有问题！是一个分布式的事务提交，有 node 可能 crash，有 node 可能不满足事务所需的数据要求，例如转账钱不够</p>
+<p>two phase：</p>
+<ol>
+<li>voting</li>
+<li>committing</li>
+</ol>
+<p>参与者需要 log 自己的 vote，发生 crash 也要记住。the coordinator需要log自己的 decision，crash 要记住，发生网络延迟可能有参与者没收到会重新要求 the coordinator 发一遍。事务是commit 还是 abort 在 commit 阶段 TC 决定 outcome 后就确定了，即使有 参与者 在 commit 前 crash，recovery 后也要记住。</p>
+<h4 id="timeout"><a href="#timeout" class="headerlink" title="timeout"></a>timeout</h4><ul>
+<li><p>participant timeout</p>
+<p>只会在第一轮到第二轮之间，参与者vote 但是没有收到 decision。如果参与者 vote NO，参与者可以 abort；如果参与者 vote YES，由于一个参与者的 YES 最后结果可能仍旧不是 Commit，参与者<strong>只能等</strong>，指需要的资源会一直被 lock</p>
+</li>
+<li><p>the coordinator timeout</p>
+<p>在第一轮中出现，TC 收不到参与者的 vote。如果有人 vote no，可以直接决定 abort；如果迟迟收不到全 YES，也可以直接 abort，虽然有可能最后收到了全部vote 都是 YES。最终决定在 the coordinator，但是为了 性能，这个 timeout 应该长一点。</p>
+</li>
+</ul>
+<h4 id="termination协议"><a href="#termination协议" class="headerlink" title="termination协议"></a>termination协议</h4><ol>
+<li>参与者$N_1$投了 YES，但是Timeout 收不到 TC 的决定</li>
+<li>可以询问其他 node $N_2$，先问有没有决定，再问 $N_2$ 的 vote<ol>
+<li>如果 $N_2$ 已经收到过 决定了，那就是$N_1$和 the coordinator 的网络有问题，用$N_2$的决定即可</li>
+<li>如果 $N_2$ 还没投，看实现，可能是 the coordinator 发的东西 $N_2$ 没收到或者忘了回<ol>
+<li>看实现，可以让$N_2$ 直接投个 NO，$N_2$要是一定要投 YES 就继续问别人</li>
+</ol>
+</li>
+<li>如果 $N_2$ 投了 NO，$N_1$ 则可以 abort</li>
+<li>如果 $N_2$ 投了 YES，继续问别人</li>
+</ol>
+</li>
+<li>如果参与者互相询问，发现所有参与者都是 YES，但都没有收到决定<ol>
+<li>仍旧不能COMMIT</li>
+<li>即使都是YES，the coordinator可能也做出 Abort 决定，如the coordinator fail，the coordinator网络 partition 导致 Timeout</li>
+</ol>
+</li>
+</ol>
+<h4 id="reboot-恢复"><a href="#reboot-恢复" class="headerlink" title="reboot 恢复"></a>reboot 恢复</h4><ul>
+<li>参与者 和 TC 都要记住自己的选择</li>
+<li>当然有很多 tradeoff 和实现细节<ul>
+<li>the coordinator 可以只 log COMMIT，参与者可以只 log YES</li>
+<li>参与者 reboot 的时候发现 YES 可以用 Termination 协议来决定行为</li>
+</ul>
+</li>
+</ul>
+<h4 id="two-phase-lock与-two-phase-commit的关系"><a href="#two-phase-lock与-two-phase-commit的关系" class="headerlink" title="two phase lock与 two phase commit的关系"></a>two phase lock与 two phase commit的关系</h4><ul>
+<li>two phase lock 是保证参与者在执行 transaction 时，访问对象的时候不发生事务间的冲突</li>
+<li>two phase commit 是用于 transaction 最后的提交阶段能在分布式场景下完成<ul>
+<li>事务提交是 two phase commit 的一个应用</li>
+</ul>
+</li>
+</ul>
+<h3 id="Why-need-consensus"><a href="#Why-need-consensus" class="headerlink" title="Why need consensus?"></a>Why need consensus?</h3><p>关注two phase commit的 fault tolerance阶段。因为two phase commit在有机器挂掉的情况下整个系统都无法前进，需要等待机器重启（网络partition），需要很长时间，需要记录状态。</p>
+<p>因此我们需要在有机器 fault 的情况下仍然能够达成一致（consensus）！之前都没有考虑 crash 的情况，需要对 coordinator、接下来进行的操作达成一致。</p>
+<p>因此诞生了paxos协议。容错的基础是 replication，replication 的基础是各个作为容错的机器在提供正常服务的时候状态等价，在two phase commit且有 coordinator crash 的情况下有两个issue：</p>
+<ol>
+<li>其他存活的机器要能发现，且选举新的 coordinator</li>
+<li>当crash的机器reboot后，需要加入容错集群，并跟上状态</li>
+</ol>
+<p>曾经的做法是RSM：</p>
+<ul>
+<li>primary backup 以保证其他机器状态与 primary 一致（没有考虑有机器挂了的情况）</li>
+<li>failure handling 存在很多挑战<ul>
+<li>detect，自己网断了还是primary网断了，对谁failure达成一致</li>
+<li>如何竞争成为新的唯一的primary，对谁成为新的primary达成一致</li>
+<li>成员人数不满的情况下对sequential operation不管新旧达成一致</li>
+</ul>
+</li>
+<li>达成一致需要 consensus 协议<ul>
+<li>需要最少三轮消息传递，开销很大，仅在出错导致状态改变需要使状态重回一致时使用</li>
+</ul>
+</li>
+</ul>
+<h3 id="Consensus-Paxos"><a href="#Consensus-Paxos" class="headerlink" title="Consensus: Paxos"></a>Consensus: Paxos</h3><p>所有人对同一个值达成一致。前提要求：</p>
+<ol>
+<li>2P+1节点中最多能挂P个节点</li>
+<li>传递的消息可以丢失、乱序或者重复，但是不会被篡改</li>
+<li>节点不会成叛徒，说假话</li>
+<li>达成一致的 value 一定是由某个 proposer 提出的</li>
+</ol>
+<p>分布式系统是一个异步系统</p>
+<ul>
+<li>消息什么时候有返回是未知的<ul>
+<li>故不能判断消息是丢了，还是还在发送中</li>
+<li>所以不能判断节点是挂了还是活着（但是不能连接）</li>
+</ul>
+</li>
+</ul>
+<h4 id="live-lock-in-paxos"><a href="#live-lock-in-paxos" class="headerlink" title="live lock in paxos"></a>live lock in paxos</h4><p>paxos 实际上不保证 termination，极端情况有live lock</p>
+<ul>
+<li>A 用编号 N 发了 prepare 获得 majority 的promise，在 A 发 accept request前</li>
+<li>B 用 N + 1 发了 prepare 获得 majority 的promise成为了 新的leader，那么 A 的 accept request 会被拒绝，然而在 B发 accept request前</li>
+<li>A 用编号 N +2 发了 prepare 获得 majority 的promise，那么在 B 的 accept request会被拒绝</li>
+<li>…</li>
+</ul>
+<h4 id="paxos-algorithm"><a href="#paxos-algorithm" class="headerlink" title="paxos algorithm"></a>paxos algorithm</h4><ul>
+<li>phase 0: client 发送 request，对于 client 的每个请求，都会产生一个 paxos 实例</li>
+<li>phase 1:<ul>
+<li>step a: leader proposer 的 prepare request  用编号N</li>
+<li>step b: acceptor 的 prepare reply （加上 promise）<ul>
+<li>编号N是收到过的最大编号<ul>
+<li>返回这个 acceptor 曾经接受过的编号最大 proposal 及 value （如果有的话）</li>
+<li>给出 promise——忽略以后编号小于 N 的proposal</li>
+</ul>
+</li>
+<li>见过比 N 大的编号，忽略</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>phase 2:<ul>
+<li>a：得到 enough promise，发送 accept request<ul>
+<li>accept request 包括<ul>
+<li>发 prepare 用的编号 N</li>
+<li>prepare reply 中存在的编号最大的value V（如果有的话），没有就自己寻一个V</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>b: accept reply to proposer / learner<ul>
+<li>收到的 accept request 中的编号仍旧是当前的 promise<ul>
+<li>记录 v</li>
+<li>发 accept OK 给 proposer 和 learner</li>
+</ul>
+</li>
+<li>否则忽略</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>phase 3: learner 返回 client</li>
+</ul>
+<h4 id="understanding-paxos"><a href="#understanding-paxos" class="headerlink" title="understanding paxos"></a>understanding paxos</h4><p>令$N_h$为见过的最大编号</p>
+<p>令$N_a$为已经接受的value的最大编号</p>
+<ol>
+<li>为什么要多 acceptor<ul>
+<li>一个 acceptor 挂了</li>
+</ul>
+</li>
+<li>为什么不直接接受第一个 proposal，而要多 proposal<ul>
+<li>发第一个proposal 的 leader 可能会挂</li>
+<li>multiple leader 可能导致这个 proposal 不会被 majority 接受</li>
+<li>允许多 proposal 可以使得曾经挂了的节点重启后追上，获取到已经确定的结果<ul>
+<li>挂了之后可能以较小的 编号发送 prepare，但是会被ignore</li>
+<li>然后会以较大的编号再发 prepare，acceptor 会把已经通过的确定的提案 value 返回</li>
+<li>这个重启节点就会再以这个 value 发 accept request，acceptor 会通过</li>
+<li>从而重启节点获得了结果，而最终 value 早就确定也不会改变</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>如果有多个活跃的leader会怎么样？<ul>
+<li>可以有多个 proposer 都通过了 prepare 阶段</li>
+<li>但是最终只会有一个 value 通过 accept 阶段</li>
+</ul>
+</li>
+<li>value 是什么时候最终被 chosen 的<ul>
+<li><strong>majority</strong> 的 acceptor 在持有合法 promise 的情况下收到 accept request&lt;N, V&gt; ，这个 value 就确认 chosen 了</li>
+<li>即使后面还有其他 leader 去 prepare 也只会选择这个 chosen V 来继续</li>
+</ul>
+</li>
+<li>如果 acceptor在send promise之后 fail<ul>
+<li>必须记住（持久化）$N_h$，见过的最大编号</li>
+<li>极端情况<ul>
+<li>如果完成 prepare 阶段后，有 P 个 acceptor 见过编号 3，P+1个acceptor 见过编号 4</li>
+<li>按照正常情况，编号3的 accept request 不会收到 majority 返回（最多P个）</li>
+<li>如果很不幸 P+1 个见过编号4 的acceptor 挂了一个，然后重启的时候没记住 $N_h$，接受了编号3的accept，就错了</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>如果 acceptor 在接受 accept request 之后挂了<ul>
+<li>必须持久化 $N_h$，$N_a$（已经接受的最大编号及相应的Va-value）</li>
+<li>同样极端情况，是 P 个 acceptor 接受了 编号 3，P+1 个接受了编号4</li>
+<li>正常情况，以后的所有 proposer 只要收到 majority 的 promise，同时会发现最大的已接受最大提案编号为 4 所对应的 value </li>
+<li>若很不幸 P+1 个接受编号 4 的 acceptor 中挂了一个，重启时没记住 Na，那么它返回的 promise 为空<ul>
+<li>以后的 proposer 会发送一个编号更大，但是携带的value是 编号为3的那个提案所对应的</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>如果leader 在发送 accept 后挂了？<ul>
+<li>重发 Mn（自己的编号为 n 的提案）</li>
+<li>也可能是 leader 连不上多数 acceptor 要求重发</li>
+</ul>
+</li>
+<li>当 leader proposer 挂了之后其他 proposer 如何发现这个问题<ul>
+<li>这是一个实现上的细节问题，实际上其他 proposer 无法判断到底leader是挂了还是网络分区了</li>
+<li>按照 Paxos 的协议实际上 每个 proposer 都会去发 propose（=prepare）</li>
+<li>在实际实现中，可能只有 leader 去发，但是其他 proposer会在接到client的请求后设置timeout，超时就认为 leader 挂了，自己作为 leader 开始发 propose了</li>
+</ul>
+</li>
+<li>什么叫同时存在两个 active 的 leader？<ul>
+<li>就是可能有多个 proposer 通过了 prepare 阶段，实际上只有一个可能通过第二阶段</li>
+<li>他们各自都认为自己的 proposal 通过了第一阶段，还没到第二阶段，故是active 的，等到进入第二阶段被 reject 就重来</li>
+<li>在真的实现中，acceptor 第二阶段发的 reject 消息可以携带现在最大 编号等信息<ul>
+<li>实现中，acceptor 和 proposer 可以在同一个物理实体中，是可以进行通信的，proposer 可以通过同物理进程下的 acceptor 发现已经有 value 被 accept 了</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h3 id="Consensus-Raft"><a href="#Consensus-Raft" class="headerlink" title="Consensus: Raft"></a>Consensus: Raft</h3><p>比 Paxos 易于理解，易于实现。都是follower，设置不同的随机 timeout 来成为 candidator 去发包，收到 majority 回包的 成功成为 leader，多个 candidator 就会看谁发得快，谁的包先到别的 follower 那，先到的先拿到票</p>
+<h2 id="To-be-continue…"><a href="#To-be-continue…" class="headerlink" title="To be continue…"></a>To be continue…</h2><h2 id="Distributed-File-System"><a href="#Distributed-File-System" class="headerlink" title="Distributed File System"></a>Distributed File System</h2><p>从这里开始进入特定的系统，而不是基础的概念和技术</p>
+<h3 id="remote-file-access"><a href="#remote-file-access" class="headerlink" title="remote file access"></a>remote file access</h3><ul>
+<li>FTP Telnet</li>
+<li>希望transparent：NAS network attached storage</li>
+<li>File Service Type：<ul>
+<li>upload，download都以文件为单位去操作，存在容量、贷款、一致性的问题</li>
+<li>remote access：传输文件操作，性能问题、拥塞</li>
+</ul>
+</li>
+</ul>
+<h3 id="文件共享的semantics"><a href="#文件共享的semantics" class="headerlink" title="文件共享的semantics"></a>文件共享的semantics</h3><p>设计的选择从cache、场景、stateful/stateless的角度来看</p>
+<ul>
+<li>stateful：保留client的信息<ol>
+<li>短请求</li>
+<li>更好的性能</li>
+<li>实现client端数据的刷新</li>
+<li>实现lock</li>
+<li>问题是：集群网络不好，client没有断开就掉了，会留下僵尸状态；client暴增的时候server会裂开</li>
+</ol>
+</li>
+<li>stateless：<ul>
+<li>扩展性好</li>
+<li>没有状态信息的问题，无法lock，不知道什么时候能delete file，因为无法确定有没有client打开了它</li>
+</ul>
+</li>
+</ul>
+<h3 id="NFS——network-file-system"><a href="#NFS——network-file-system" class="headerlink" title="NFS——network file system"></a>NFS——network file system</h3><p>强调transparency与易用性，每个人都是client也都是server，支持diskless工作站，恩地没有磁盘，并且是stateless的，长请求（据说现在已经转向stateful了…）</p>
+<p>在使用过程中，向上提供open操作，实际使用lookup，模拟出fd，然而不保证真的有这个文件，read可能读不到，一般比本地读要慢。cache使用timestamp方式处理，总是在一定时间后invalidate。</p>
+<p>存在的问题有：</p>
+<ul>
+<li>文件一致性</li>
+<li>没有reference count：所有的长亲贵都是独立的</li>
+<li>没有锁</li>
+</ul>
+<h3 id="GFS——Google-file-system"><a href="#GFS——Google-file-system" class="headerlink" title="GFS——Google file system"></a>GFS——Google file system</h3><p>用廉价存储支持大规模可扩展的数据密集型应用。设计的场景是：文件很大，生命周期很长，大量的机器 failure 很常见；文件访问一般是append，顺序写入，随机写非常少，尤其是并发写。</p>
+<p>因此，app和fs是协同设计的，app只能通过特定的client去访问，修改了文件系统接口，没有VFS，只有User-level API，增加了append操作，允许并发原子append</p>
+<p>结构一般为N个chunk 和 1个 master。master存储metadata，以在一台机器的内存里。多节点replica，对于读很好，但是随机写的情况很少</p>
+<p>开源实现HDFS，不能random写，只能append</p>
+<h2 id="Data-parallel-Programming"><a href="#Data-parallel-Programming" class="headerlink" title="Data-parallel Programming"></a>Data-parallel Programming</h2><h3 id="MapReduce"><a href="#MapReduce" class="headerlink" title="MapReduce"></a>MapReduce</h3><p>并行编程，如何使用大规模普通机器去计算大数据。并行有两种方式：</p>
+<ul>
+<li>程序的并行：困难，往往步骤之间是有依赖关系的</li>
+<li>数据的并行：每个数据都在做相同操作，数据之间的操作没有依赖</li>
+</ul>
+<p>并行计算分为集群计算（Cluster computing）和网格计算（Grid computing）</p>
+<h4 id="MapReduce架构"><a href="#MapReduce架构" class="headerlink" title="MapReduce架构"></a>MapReduce架构</h4><p>分为两层，大量应用。spark pytorch都是这样的。</p>
+<ul>
+<li>接口层：这是指编程模型，即使用编程模型的业务应用程序员</li>
+<li>平台/框架：实现接口，解决分布式问题，系统/分布式程序员</li>
+</ul>
+<h4 id="编程模型"><a href="#编程模型" class="headerlink" title="编程模型"></a>编程模型</h4><ul>
+<li>功能足够且接口简单，就实现两个接口，想法来自于函数式编程</li>
+<li>Map接口：<ul>
+<li>输入划分(partition)完的 chunk/shard 数据</li>
+<li>输出中间结果 (k,v) pair</li>
+<li>Maper 还要 partition 中间文件。中间文件存在Mapper本地</li>
+</ul>
+</li>
+<li>Reduce接口：<ul>
+<li>Reducer先排序中间结果，把相同key聚集</li>
+<li>输入排序后聚集的数据 (k, set of v)，一个 key 的所有 value<ul>
+<li>所有相同的 key 要聚集在一起给 reduce，由框架的shuffle完成</li>
+<li>不同的reducer处理不同的key：hash(key) % R</li>
+</ul>
+</li>
+<li>输出reduce结果：merge所有key的结果</li>
+</ul>
+</li>
+</ul>
+<h4 id="局部性"><a href="#局部性" class="headerlink" title="局部性"></a>局部性</h4><p>网络开销是分布式一大问题。输入输出的文件在 GFS 上，希望把执行 map 的机器也放在这些机器上运行，map要用的输入文件就在本地。可以由 GFS Maaster 和 MapReduce Master 协调完成。</p>
+<h4 id="容错"><a href="#容错" class="headerlink" title="容错"></a>容错</h4><ul>
+<li>worker failure<ul>
+<li>如果真的挂了，策略是 re-execute。甚至换人做，重复做也可以，只要能记住输入对应的中间文件。partition 的时候跳过 损坏的 和 重复的</li>
+<li>如果 logging 会有很大开销</li>
+</ul>
+</li>
+<li>master failure<ul>
+<li>放在 GFS Master 一起，主从备份</li>
+<li>需要备份状态</li>
+</ul>
+</li>
+<li>straggler<ul>
+<li>这个任务做得很慢</li>
+<li>backup 执行，相当于 re-execute，其他人都做完了在等可以来 backup 执行。第一个做完的 win，其他人就停</li>
+<li>这也是写在本地的原因，要是发过去，可能会很多人都给 reduce 发同一份数据</li>
+</ul>
+</li>
+</ul>
+<h4 id="中间结果存在mapper还是reducer？"><a href="#中间结果存在mapper还是reducer？" class="headerlink" title="中间结果存在mapper还是reducer？"></a>中间结果存在mapper还是reducer？</h4><ul>
+<li>存在mapper的好处<ul>
+<li>可以提前做聚集，来减少网络传输开销</li>
+<li>如果 map failure 了，发送数据是否成功且完整会影响 reduce 执行，不如选择在 map 这保存之后再发送</li>
+<li>如果 reduce failure 了，可以重复去 mapper 读取数据，而不需要 map 重新做</li>
+</ul>
+</li>
+<li>存在reducer（直接发过去）的好处<ul>
+<li>pipeline，reduce 可以再整个计算完成前提前提供中间结果</li>
+</ul>
+</li>
+</ul>
+<h4 id="后续的优化"><a href="#后续的优化" class="headerlink" title="后续的优化"></a>后续的优化</h4><p>​    如谷歌的网页搜索，希望做增量计算，而mapreduce不支持，所有有新的框架：caffeine</p>
+<h3 id="Dryad"><a href="#Dryad" class="headerlink" title="Dryad"></a>Dryad</h3><p>微软强大的系统框架，但是不成功，不告诉你系统的细节和代码，还想收费，大大领先 mapreduce，但是少人知道。</p>
+<p>与 Mapreduce 相似的目标，但是有区别。以 graph、DAG 的方式描述业务逻辑，表达依赖关系，而 mapreduce 不管你业务逻辑，只有 map - reduce 一种，灵活调度。表达能力比 MR 强很多，MR业务逻辑都要表达成 MR，而 这是 DAG Directed Acyclic Graph ，有向无环图，每个程序都能被表示成 dataflow graph</p>
+<h4 id="容错-1"><a href="#容错-1" class="headerlink" title="容错"></a>容错</h4><p>也是重做，可以用 顶点 追溯执行，针对 DAG 图</p>
+<h4 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h4><p>更灵活的 op，只是程序员需要掌握更多东西；根据DAG自动优化（编译器），比MR更先进</p>
+<h3 id="Tensorflow"><a href="#Tensorflow" class="headerlink" title="Tensorflow"></a>Tensorflow</h3><ul>
+<li>参数服务器</li>
+<li>将单个 op 作为 数据流图的节点</li>
+<li>同步异步训练</li>
+<li>straggler backup</li>
+</ul>
+<h2 id="Graph-Computing"><a href="#Graph-Computing" class="headerlink" title="Graph Computing"></a>Graph Computing</h2><p>图计算比原本的 Data Parallel 要复杂很多，数据之间有依赖关系，例如page rank。如何用framework来支持这样的计算呢？图计算！</p>
+<p>图并行算法，特征是图结构描述数据依赖，一个顶点更新与一个范围（邻居）内的数据有关，迭代更新</p>
+<h3 id="从修改现有框架开始"><a href="#从修改现有框架开始" class="headerlink" title="从修改现有框架开始"></a>从修改现有框架开始</h3><p>page rank可以在MapReduce中实现，但是很麻烦，数据冗余度也会很大，同时mapreduce不支持迭代更新，每次mapreduce只更新一个迭代，需要多次运行mapreduce实例，在这个过程中每次中间数据都会被持久化，没有任何优化，所以需要有专门的图计算框架！</p>
+<h3 id="Pregel，-Google-2010"><a href="#Pregel，-Google-2010" class="headerlink" title="Pregel， Google 2010"></a>Pregel， Google 2010</h3><p>使用BSP（bulk synchronous parallel），节点直接只有消息传递，即使是同一台机器。机器之间的message-passing是bulk化的，即batch。superstep=迭代次数，需要保证同步，所有节点都受到消息，批量传递，提高网络利用效率。</p>
+<p>从节点的角度计算，接受上次superstep的消息，计算user-define计算function，发送消息到neighbor</p>
+<h3 id="GraphLab"><a href="#GraphLab" class="headerlink" title="GraphLab"></a>GraphLab</h3><p>因为Pregel中的BSP是个同步模型，每个superstep所有的节点都会更新，但是不同节点达到收敛所需的迭代次数不同，所有节点都要同步根棍也会更新这些节点，浪费！同时性能也会被运行最慢的节点限制，造成木桶效应。</p>
+<p>因此GraphLab提出了异步模型，只有邻居变化时才更新。苏联是分布式的图结构，但是是基于shared memory的，图数据如何划分呢？vertex-cut和edge-cut。</p>
+<p>支持动态收敛，可以一部分节点先收敛后停止运行。因此执行模型是节点计算时去pull邻居的数据。而不是邻居send数据给邻居，在Pregel里邻居主动push就会不支持动态收敛，异步执行，每个superstep都要求所有人发消息</p>
+<p>一致性模型：race-free</p>
+<p>三种consistency</p>
+<ul>
+<li>full：锁当前vertex、相关的边和所有邻居vertex</li>
+<li>edge：锁当前vertex、相关的边</li>
+<li>vertex：只锁当前的vertex</li>
+</ul>
+<h3 id="PowerLyra：Differentiated-Graph-Computation-and-Partitioning-on-Skewed-Graphs"><a href="#PowerLyra：Differentiated-Graph-Computation-and-Partitioning-on-Skewed-Graphs" class="headerlink" title="PowerLyra：Differentiated Graph Computation and Partitioning on Skewed Graphs"></a>PowerLyra：Differentiated Graph Computation and Partitioning on Skewed Graphs</h3><p>之前的框架妖魔vertex-cut，要么edge-cut，<strong>one size fits all</strong>。于是powerLyra对 low-degree vertex 用 edge-cut，对 high-degree vertex 用 vertex-cut。</p>
+<p>edge-cut：</p>
+<ul>
+<li>是切分边，把边切断放到不同的分区，从而分散了不同的点</li>
+<li>对于一个点来说有较好的局部性</li>
+<li>适合低度数的点，只要用cache把入边对应的点缓存了，就有单向局部性</li>
+</ul>
+<p>vertex-cut:</p>
+<ul>
+<li>是切分点，把点切成好几份（mirror）放到不同的分区，从而分散了一个点不同的边</li>
+<li>能缓解 幂律分布下高度数节点导致的负载不均衡情况</li>
+<li>适合高度数的点，会产生mirror，需要用GAS消息传递</li>
+</ul>
+<h4 id="GAS模型"><a href="#GAS模型" class="headerlink" title="GAS模型"></a>GAS模型</h4><p>将一个顶点的计算分成了三个阶段。</p>
+<p>gather：收集数据</p>
+<p>apply：更新节点本身的数据</p>
+<p>scatter：发送信息给邻居</p>
+<p>为什么要分成三个阶段？之前的计算是都面向顶点的，所有计算都要在顶点上完成，但是图计算的复杂度不在顶点上，而在边上，一般来说边的数量远大于点的数量，比如Gather阶段就是面向边的规模，可以通过分散边来提高并行。</p>
+<p>缺点：</p>
+<ul>
+<li>虽然提供了细粒度的阶段来提高并行</li>
+<li>但是由于限制了每个阶段的参与者，降低了功能性<ul>
+<li>Gather只能来自邻居</li>
+<li>原本的 Pregal 的计算可以在该阶段获取距离为2的节点信息来计算</li>
+<li>而GAS限制了这个操作</li>
+</ul>
+</li>
+</ul>
+<h3 id="GraphChi：Graph-processing-on-Single-machine"><a href="#GraphChi：Graph-processing-on-Single-machine" class="headerlink" title="GraphChi：Graph processing on Single machine"></a>GraphChi：Graph processing on Single machine</h3><p>单机上的好处：更容易debug，而且分布式图算法更难设计实现。基于磁盘IO的挑战：访问时延是数量级差距，读数据容易Random Access，主要贡献在于如何解决磁盘上的随机访问开销。</p>
+<p>因此提出了PSW（parallel sliding window）：分别为load、compute、write三个阶段</p>
+<p>load：划分成 P 个 sub-graph</p>
+<ul>
+<li>把顶点划分成P 个不相交集合，称为 interval</li>
+<li>把<strong>入边</strong>放到 所在 interval 相连的 shard 中<ul>
+<li>即shard中的边的 <strong>target</strong> 在相连的 interval 中</li>
+</ul>
+</li>
+<li>要求所有 shard 中的入边按照 source 进行排序<ul>
+<li>从而使得所有 shard 中的边都按照 边的source 全局排序，而不是target</li>
+<li>每个 interval 的部分计算需要的局部性边（出边）在其他interval 的 shard 中都是连续的</li>
+<li>使得每次 sub-graph 加载都是 P 次连续读</li>
+</ul>
+</li>
+<li>需要P^2连续读取</li>
+</ul>
+<p>compute：</p>
+<ul>
+<li>所需出入边都被读取到内存了</li>
+<li>可以直接执行</li>
+</ul>
+<p>write：</p>
+<p>​    P^2写回</p>
+<p>半异步：</p>
+<ul>
+<li>在计算不同个interval的时候</li>
+<li>后面的 interval 计算能看到前面的计算结果</li>
+<li>既不是同步的，也不是快照的完全异步</li>
+</ul>
+<h2 id="Multicore-amp-NUMA-phoenix-amp-TMR"><a href="#Multicore-amp-NUMA-phoenix-amp-TMR" class="headerlink" title="Multicore &amp; NUMA: phoenix &amp; TMR"></a>Multicore &amp; NUMA: phoenix &amp; TMR</h2><h3 id="TMR（Tiled-MapReduce）"><a href="#TMR（Tiled-MapReduce）" class="headerlink" title="TMR（Tiled MapReduce）"></a>TMR（Tiled MapReduce）</h3><p>在单机中使用MapReduce，数据量可能不需要这么大，需要关注并发程度。</p>
+<p>多核刚出现的时候，pheonix就把 MapReduce 应用到单机多核框架下，利用thread模式，共享内存空间，但是仍然存在问题：</p>
+<ol>
+<li>大量的内存使用<ol>
+<li>需要保留整个输入数据，限制数据规模</li>
+<li>输入数据占用几乎全部空间：大小和效率</li>
+</ol>
+</li>
+<li>数据局部性差<ol>
+<li>虽然对于intermediate buffer有局部性考虑。key存的是指针</li>
+<li>输入数据局部性较好</li>
+<li>map，当前处理的数据如果与之前的数据需要有交互如比较，局部性就很差</li>
+<li>reduce，完全需要随机的访问</li>
+</ol>
+</li>
+<li>强阶段间的barrier<ol>
+<li>阶段改变的时候 CPU 会 idle 浪费</li>
+<li>如某个 reduce 需要很久，其他 cpu 都要等着</li>
+</ol>
+</li>
+</ol>
+<p>因此提出了TMR：借用 Tiling 技术（常用于编译器），一种数据划分的方式，对于整个任务（输入数据）的划分。对小批量数据进行原本的 Map-Reduce，论文中称为 Map-Conbine操作，最后对划分的各个结果进行 reduce，要求reduce满足交换律和结合律，基本都满足。在sub-job中，执行一个iteration输入数据的 map 和 combine（与原本的reduce功能一致），生成 iteration buffer 的部分结果，与 input 同构，最后 reduce 生成 final buffer。</p>
+<p>同时提出了三个优化：</p>
+<ul>
+<li>内存复用<ul>
+<li>数据结构复用</li>
+<li>key 的指针不能用了（输入的小块内存下一个MA会换）</li>
+</ul>
+</li>
+<li>局部性优化<ul>
+<li>小批的working-set数据自然有更好的局部性</li>
+<li>在NUMA下跨CPU的cache 访问很慢，接近内存访问</li>
+<li>如何避免 remote cache access呢？提供新的调度器</li>
+<li>对不同的CPU（多core）执行不同的输入数据块<ul>
+<li>各有一套 intermediate buffer 和 interation buffer</li>
+<li>完全避免了远程缓存访问，数据压根就不一样</li>
+<li>反正最后都要等每块输入计算完成，整体上是差不多的</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>流水线化<ul>
+<li>Reduce结束后CPU不需要IDLE</li>
+<li>可以进入下一块输入的 map 阶段</li>
+</ul>
+</li>
+</ul>
+<h2 id="Improving-in-memory-Computing-with-New-Hardware-Features"><a href="#Improving-in-memory-Computing-with-New-Hardware-Features" class="headerlink" title="Improving in-memory Computing with New Hardware Features"></a>Improving in-memory Computing with New Hardware Features</h2><p>关注新硬件提升性能。业务需要high throughput，关注单位时间能完成的请求，峰值并发量；low latency，关注单一请求完成的时延，用户体验</p>
+<p>一般的解决方式是分布式数据中心。硬件平台有了新的硬件: HTM NVM GPU RDMA，重构上层系统软件以更好地利用新硬件的特性</p>
+<h3 id="HTM"><a href="#HTM" class="headerlink" title="HTM"></a>HTM</h3><p>提供硬件事务支持，自动保证 all-or-nothing，解决事务间的冲突。Intel 下的叫做 RTM，提供了三条新的指令，xbegin、xend、xabort，是Restricted 的，由于基于cache-coherent实现，要是访问数据规模超过缓存就会abort，不能有system call，如 pf、io。</p>
+<h3 id="RDMA"><a href="#RDMA" class="headerlink" title="RDMA"></a>RDMA</h3><p>DMA，用于CPU托付DMA这个硬件去访问内存；RDMA，1的CPU 托付 2的网卡 去访问 2 的内存，不经过 2 的CPU：</p>
+<ul>
+<li>one-side，提供一侧的 READ、WRITE<ul>
+<li>从远端取数据的时延在 3us 以内<ul>
+<li>two-side 的可以用 IPoIB 模拟 TCP/IP 的接口，无需修改上层应用，100us</li>
+<li>作为对比，CPU直接访存的时延 100 ns = 0.1 us，数量级差距在10倍，访问网络相比磁盘（10^3倍）更快</li>
+</ul>
+</li>
+<li>READ、WRITE编程接口，可以直接访问远程内存，不经过远端CPU，原本是做不到的</li>
+</ul>
+</li>
+<li>two-side，提供两侧的 SEND 、RECV</li>
+</ul>
+<h3 id="hardware-offloading"><a href="#hardware-offloading" class="headerlink" title="hardware offloading"></a>hardware offloading</h3><p>即软件做的事情交给硬件做。例如事务检查、远程内存访问，但是硬件往往需要软件打 patch ，稀释了硬件的性能优势。比如 RDMA 只提供访存，不提供大的一致性，只提供 cache line 级别的一致性，分次读取一大块远程内存数据可能是不一致的，所以跨 cache line 才会不一致，硬件以 cache line 为单位读取。</p>
+<p>解决方法是硬件组合来规避：HTM + RDMA -&gt;DRTM</p>
+<h3 id="DRTM：用-RDMA-及-HTM-来支持key-value-store的both-Read-和-Write"><a href="#DRTM：用-RDMA-及-HTM-来支持key-value-store的both-Read-和-Write" class="headerlink" title="DRTM：用 RDMA 及 HTM 来支持key-value store的both Read 和 Write"></a>DRTM：用 RDMA 及 HTM 来支持key-value store的both Read 和 Write</h3><p>key-value store：软件去利用新硬件的时候需要做更多的限制，或者组合不同的硬件来规避单一硬件存在的问题。</p>
+<p>RDMA的问题：</p>
+<ul>
+<li>只提供 cache line 级别访问的一致性</li>
+<li>一般读取的东西比较大，会超过 cacheline</li>
+<li>解决方案：<ul>
+<li>直观做法是加 checksum，计算复杂需要CPU，红利就没了, Pilaf（ATC’13）</li>
+<li>比较好的是需要在 cache line 加 version 以保证跨 cacheline 的多次读取是一致的，FaRM（NSDI’14）</li>
+</ul>
+</li>
+<li>上述两个工作都只利用RDMA去 Read，而把 write 只允许发送到 key 所在的机器 local write<ul>
+<li>设计更好的数据结构优化 cache 以提高 read，可能让 write 更麻烦</li>
+<li>Pilaf 使用 Cuckoo hash（一种多哈希），优化读</li>
+<li>但是复杂的写使得 HTM 难以被利用，容易超出 cache 范围自动 abort</li>
+<li>在本地检查 WW 冲突</li>
+</ul>
+</li>
+<li>能不能用RDMA及HTM来支持both Read和Write？于是有了DRTM</li>
+</ul>
+<p>简单的hash方式，使得可以利用HTM做 race detection</p>
+<ul>
+<li>远程RDMA读或写 会 打断本地的 Txn</li>
+</ul>
+<p>允许One-sided RMDA 去 write</p>
+<p>设计 cache，只本地缓存 key 和 value 的位置信息，不包括 value 的值</p>
+<ul>
+<li>虽然缓存仍旧需要远程读</li>
+<li>但是规避了 version 来保护一致性的需要</li>
+<li>多线程可以同时填充这个 cache</li>
+</ul>
+<h3 id="找到新的合适的硬件去优化分布式系统"><a href="#找到新的合适的硬件去优化分布式系统" class="headerlink" title="找到新的合适的硬件去优化分布式系统"></a>找到新的合适的硬件去优化分布式系统</h3><ol>
+<li>了解其编程接口、性能特性</li>
+<li>尽可能发挥硬件性能的软件重构以 offloading 功能到硬件</li>
+<li>用软件的方式解决硬件操作可能的限制</li>
+<li>一种硬件有大限制就用硬件的组合</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/zztttt.github.io/tags/operating-system/" rel="tag"># operating system</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/zztttt.github.io/2020/11/10/hexo-WARN-No-layout-index-html/" rel="prev" title="hexo: 'WARN: No layout: index.html'">
+      <i class="fa fa-chevron-left"></i> hexo: 'WARN: No layout: index.html'
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Overview"><span class="nav-number">1.</span> <span class="nav-text">Overview</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Contents"><span class="nav-number">2.</span> <span class="nav-text">Contents</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Consistency-in-Distributed-System"><span class="nav-number">3.</span> <span class="nav-text">Consistency in Distributed System</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Strict-Consistency"><span class="nav-number">3.1.</span> <span class="nav-text">Strict Consistency</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Linearizability"><span class="nav-number">3.2.</span> <span class="nav-text">Linearizability</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Sequential-Consistency"><span class="nav-number">3.3.</span> <span class="nav-text">Sequential Consistency</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Release-Consistency"><span class="nav-number">3.4.</span> <span class="nav-text">Release Consistency</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Eventual-Consistency"><span class="nav-number">3.5.</span> <span class="nav-text">Eventual Consistency</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Challenge-of-Clock-Time-物理时钟和逻辑时钟（Lamport时钟）"><span class="nav-number">3.5.1.</span> <span class="nav-text">Challenge of Clock Time: 物理时钟和逻辑时钟（Lamport时钟）</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Casual-Consistency"><span class="nav-number">3.6.</span> <span class="nav-text">Casual Consistency</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Crash-Recovery-amp-Logging"><span class="nav-number">4.</span> <span class="nav-text">Crash Recovery &amp; Logging</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#为什么要crash-recovery？"><span class="nav-number">4.1.</span> <span class="nav-text">为什么要crash recovery？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#如何crash-recovery？"><span class="nav-number">4.2.</span> <span class="nav-text">如何crash recovery？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Solution：-Logging"><span class="nav-number">4.3.</span> <span class="nav-text">Solution： Logging</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#如何做checkpoint？"><span class="nav-number">4.4.</span> <span class="nav-text">如何做checkpoint？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#如何从checkpoint中recovery？"><span class="nav-number">4.5.</span> <span class="nav-text">如何从checkpoint中recovery？</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#UNDO-REDO-logging"><span class="nav-number">4.5.1.</span> <span class="nav-text">UNDO-REDO logging</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#REDO-ONLY-logging"><span class="nav-number">4.5.2.</span> <span class="nav-text">REDO-ONLY logging</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#UNDO-ONLY-logging"><span class="nav-number">4.5.3.</span> <span class="nav-text">UNDO-ONLY logging</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Concurrency-Control"><span class="nav-number">5.</span> <span class="nav-text">Concurrency Control</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#为什么需要concurrency-control？"><span class="nav-number">5.1.</span> <span class="nav-text">为什么需要concurrency control？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#事务的ACID"><span class="nav-number">5.2.</span> <span class="nav-text">事务的ACID</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#serializability"><span class="nav-number">5.3.</span> <span class="nav-text">serializability</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#如何保证-serializable-schedule-呢？"><span class="nav-number">5.3.1.</span> <span class="nav-text">如何保证 serializable schedule 呢？</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#隔离级别"><span class="nav-number">5.4.</span> <span class="nav-text">隔离级别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Multi-Version-Concurrency-Control"><span class="nav-number">5.5.</span> <span class="nav-text">Multi Version Concurrency Control</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Snapshot-Isolation"><span class="nav-number">5.6.</span> <span class="nav-text">Snapshot Isolation</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#snapshot-isolation不等于serializability"><span class="nav-number">5.6.1.</span> <span class="nav-text">snapshot isolation不等于serializability</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#可是什么是serializable-snapshot-isolation？"><span class="nav-number">5.6.2.</span> <span class="nav-text">可是什么是serializable snapshot isolation？</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Consensus"><span class="nav-number">6.</span> <span class="nav-text">Consensus</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#two-phase-commit"><span class="nav-number">6.1.</span> <span class="nav-text">two phase commit</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#timeout"><span class="nav-number">6.1.1.</span> <span class="nav-text">timeout</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#termination协议"><span class="nav-number">6.1.2.</span> <span class="nav-text">termination协议</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#reboot-恢复"><span class="nav-number">6.1.3.</span> <span class="nav-text">reboot 恢复</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#two-phase-lock与-two-phase-commit的关系"><span class="nav-number">6.1.4.</span> <span class="nav-text">two phase lock与 two phase commit的关系</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Why-need-consensus"><span class="nav-number">6.2.</span> <span class="nav-text">Why need consensus?</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Consensus-Paxos"><span class="nav-number">6.3.</span> <span class="nav-text">Consensus: Paxos</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#live-lock-in-paxos"><span class="nav-number">6.3.1.</span> <span class="nav-text">live lock in paxos</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#paxos-algorithm"><span class="nav-number">6.3.2.</span> <span class="nav-text">paxos algorithm</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#understanding-paxos"><span class="nav-number">6.3.3.</span> <span class="nav-text">understanding paxos</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Consensus-Raft"><span class="nav-number">6.4.</span> <span class="nav-text">Consensus: Raft</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#To-be-continue…"><span class="nav-number">7.</span> <span class="nav-text">To be continue…</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Distributed-File-System"><span class="nav-number">8.</span> <span class="nav-text">Distributed File System</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#remote-file-access"><span class="nav-number">8.1.</span> <span class="nav-text">remote file access</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#文件共享的semantics"><span class="nav-number">8.2.</span> <span class="nav-text">文件共享的semantics</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NFS——network-file-system"><span class="nav-number">8.3.</span> <span class="nav-text">NFS——network file system</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GFS——Google-file-system"><span class="nav-number">8.4.</span> <span class="nav-text">GFS——Google file system</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Data-parallel-Programming"><span class="nav-number">9.</span> <span class="nav-text">Data-parallel Programming</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#MapReduce"><span class="nav-number">9.1.</span> <span class="nav-text">MapReduce</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#MapReduce架构"><span class="nav-number">9.1.1.</span> <span class="nav-text">MapReduce架构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#编程模型"><span class="nav-number">9.1.2.</span> <span class="nav-text">编程模型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#局部性"><span class="nav-number">9.1.3.</span> <span class="nav-text">局部性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#容错"><span class="nav-number">9.1.4.</span> <span class="nav-text">容错</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#中间结果存在mapper还是reducer？"><span class="nav-number">9.1.5.</span> <span class="nav-text">中间结果存在mapper还是reducer？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#后续的优化"><span class="nav-number">9.1.6.</span> <span class="nav-text">后续的优化</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Dryad"><span class="nav-number">9.2.</span> <span class="nav-text">Dryad</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#容错-1"><span class="nav-number">9.2.1.</span> <span class="nav-text">容错</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#优点"><span class="nav-number">9.2.2.</span> <span class="nav-text">优点</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Tensorflow"><span class="nav-number">9.3.</span> <span class="nav-text">Tensorflow</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Graph-Computing"><span class="nav-number">10.</span> <span class="nav-text">Graph Computing</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#从修改现有框架开始"><span class="nav-number">10.1.</span> <span class="nav-text">从修改现有框架开始</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Pregel，-Google-2010"><span class="nav-number">10.2.</span> <span class="nav-text">Pregel， Google 2010</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GraphLab"><span class="nav-number">10.3.</span> <span class="nav-text">GraphLab</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#PowerLyra：Differentiated-Graph-Computation-and-Partitioning-on-Skewed-Graphs"><span class="nav-number">10.4.</span> <span class="nav-text">PowerLyra：Differentiated Graph Computation and Partitioning on Skewed Graphs</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#GAS模型"><span class="nav-number">10.4.1.</span> <span class="nav-text">GAS模型</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GraphChi：Graph-processing-on-Single-machine"><span class="nav-number">10.5.</span> <span class="nav-text">GraphChi：Graph processing on Single machine</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Multicore-amp-NUMA-phoenix-amp-TMR"><span class="nav-number">11.</span> <span class="nav-text">Multicore &amp; NUMA: phoenix &amp; TMR</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#TMR（Tiled-MapReduce）"><span class="nav-number">11.1.</span> <span class="nav-text">TMR（Tiled MapReduce）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Improving-in-memory-Computing-with-New-Hardware-Features"><span class="nav-number">12.</span> <span class="nav-text">Improving in-memory Computing with New Hardware Features</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#HTM"><span class="nav-number">12.1.</span> <span class="nav-text">HTM</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RDMA"><span class="nav-number">12.2.</span> <span class="nav-text">RDMA</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#hardware-offloading"><span class="nav-number">12.3.</span> <span class="nav-text">hardware offloading</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DRTM：用-RDMA-及-HTM-来支持key-value-store的both-Read-和-Write"><span class="nav-number">12.4.</span> <span class="nav-text">DRTM：用 RDMA 及 HTM 来支持key-value store的both Read 和 Write</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#找到新的合适的硬件去优化分布式系统"><span class="nav-number">12.5.</span> <span class="nav-text">找到新的合适的硬件去优化分布式系统</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ZhangZhengtong</p>
+  <div class="site-description" itemprop="description">SE@SJTU</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/zztttt.github.io/archives/">
+        
+          <span class="site-state-item-count">32</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/zztttt.github.io/categories/">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/zztttt.github.io/tags/">
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZhangZhengtong</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/zztttt.github.io/lib/anime.min.js"></script>
+  <script src="/zztttt.github.io/lib/velocity/velocity.min.js"></script>
+  <script src="/zztttt.github.io/lib/velocity/velocity.ui.min.js"></script>
+<script src="/zztttt.github.io/js/utils.js"></script><script src="/zztttt.github.io/js/motion.js"></script>
+<script src="/zztttt.github.io/js/schemes/muse.js"></script>
+<script src="/zztttt.github.io/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

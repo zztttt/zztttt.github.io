@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.8.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/zztttt.github.io/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/zztttt.github.io/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/zztttt.github.io/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/zztttt.github.io/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/zztttt.github.io/css/main.css">
+
+
+<link rel="stylesheet" href="/zztttt.github.io/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"github.com","root":"/zztttt.github.io/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="prepare a CI/CD environmentPrepare a web app, build contain imageAutomatically build images after a PR 前端 后端  搭建步骤 使用Travis.CI搭建CI/CD，关于github与其账户的连接并使得Travis.CI监控目标项目的代码变更过程可以看之前的Github项目 这次的项目是一个web">
+<meta name="keywords" content="k8s">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用rke部署Kubernetes集群">
+<meta property="og:url" content="http://github.com/2019/03/11/KuberneteDeployment/index.html">
+<meta property="og:site_name" content="zztttt">
+<meta property="og:description" content="prepare a CI/CD environmentPrepare a web app, build contain imageAutomatically build images after a PR 前端 后端  搭建步骤 使用Travis.CI搭建CI/CD，关于github与其账户的连接并使得Travis.CI监控目标项目的代码变更过程可以看之前的Github项目 这次的项目是一个web">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://zztttt.github.io/picture/KuberneteDeployment/dockerRepo.jpg">
+<meta property="og:image" content="https://zztttt.github.io/picture/KuberneteDeployment/dep1.png">
+<meta property="og:image" content="https://zztttt.github.io/picture/KuberneteDeployment/dep2.png">
+<meta property="og:image" content="https://zztttt.github.io/picture/KuberneteDeployment/initconfig.jpg">
+<meta property="og:image" content="https://zztttt.github.io/picture/KuberneteDeployment/init.jpg">
+<meta property="og:image" content="https://zztttt.github.io/picture/KuberneteDeployment/1rep.jpg">
+<meta property="og:image" content="https://zztttt.github.io/picture/KuberneteDeployment/2init.jpg">
+<meta property="og:image" content="https://zztttt.github.io/picture/KuberneteDeployment/2rep.jpg">
+<meta property="og:image" content="https://zztttt.github.io/picture/KuberneteDeployment/3init.jpg">
+<meta property="og:image" content="https://zztttt.github.io/picture/KuberneteDeployment/3rep.jpg">
+<meta property="og:image" content="https://zztttt.github.io/picture/KuberneteDeployment/test.png">
+<meta property="og:updated_time" content="2022-08-13T10:01:38.570Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="使用rke部署Kubernetes集群">
+<meta name="twitter:description" content="prepare a CI/CD environmentPrepare a web app, build contain imageAutomatically build images after a PR 前端 后端  搭建步骤 使用Travis.CI搭建CI/CD，关于github与其账户的连接并使得Travis.CI监控目标项目的代码变更过程可以看之前的Github项目 这次的项目是一个web">
+<meta name="twitter:image" content="https://zztttt.github.io/picture/KuberneteDeployment/dockerRepo.jpg">
+
+<link rel="canonical" href="http://github.com/2019/03/11/KuberneteDeployment/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>使用rke部署Kubernetes集群 | zztttt</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/zztttt.github.io/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">zztttt</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/zztttt.github.io/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/zztttt.github.io/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope="" itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://github.com/2019/03/11/KuberneteDeployment/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/zztttt.github.io/images/avatar.gif">
+      <meta itemprop="name" content="ZhangZhengtong">
+      <meta itemprop="description" content="SE@SJTU">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="zztttt">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          使用rke部署Kubernetes集群
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-03-11 11:22:58" itemprop="dateCreated datePublished" datetime="2019-03-11T11:22:58+08:00">2019-03-11</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-08-13 18:01:38" itemprop="dateModified" datetime="2022-08-13T18:01:38+08:00">2022-08-13</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/zztttt.github.io/categories/k8s/" itemprop="url" rel="index"><span itemprop="name">k8s</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="prepare-a-CI-CD-environment"><a href="#prepare-a-CI-CD-environment" class="headerlink" title="prepare a CI/CD environment"></a>prepare a CI/CD environment</h3><h3 id="Prepare-a-web-app-build-contain-image"><a href="#Prepare-a-web-app-build-contain-image" class="headerlink" title="Prepare a web app, build contain image"></a>Prepare a web app, build contain image</h3><h3 id="Automatically-build-images-after-a-PR"><a href="#Automatically-build-images-after-a-PR" class="headerlink" title="Automatically build images after a PR"></a>Automatically build images after a PR</h3><ul>
+<li><a href="https://github.com/FJJLeon/k8s-bookstore-front">前端</a></li>
+<li><a href="https://github.com/FJJLeon/k8s-bookstore">后端</a></li>
+</ul>
+<h2 id="搭建步骤"><a href="#搭建步骤" class="headerlink" title="搭建步骤"></a>搭建步骤</h2><ol>
+<li>使用<strong>Travis.CI</strong>搭建CI/CD，关于github与其账户的连接并使得Travis.CI监控目标项目的代码变更过程可以看之前的<a href="https://github.com/FJJLeon/wordladderCICD">Github项目</a></li>
+<li><p>这次的项目是一个web app，需要使用 MySQL 作为数据库，需要在配置文件 <strong>.travis.yml</strong> 中设置mysql服务。还新建了config/database.yml,作用未知</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">services:</span><br><span class="line">  - mysql</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>CICD平台启动 <strong>mvn test</strong> 测试时会连接mysql数据库，需要<strong>设置root密码</strong>与JDBC一致，并作hibernate映射，需要在数据库中有相应的DATABASE和TABLE，因而要在配置文件中<strong>运行mysql脚本</strong>生成scheme并插入数据</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">before_install:</span><br><span class="line">  - echo &quot;USE mysql;\nUPDATE user SET password=PASSWORD(&apos;xxx&apos;) WHERE user=&apos;root&apos;;\nFLUSH PRIVILEGES;\n&quot; | mysql -u root</span><br><span class="line">  - mysql -u root --password=&quot;xxx&quot; &lt; sqlscript/all2.sql</span><br><span class="line">  - sudo service mysql restart</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>使用 <strong>mvn install</strong> 打包项目文件生成 war 包</p>
+</li>
+<li><p>构建 <strong>docker image</strong> 需要使用 <strong>Dockerfile</strong> 如下，该文件指导docker build 指令如何从 tomcat 基础镜像开始构建新的镜像，主要是用 <strong>ADD</strong> 将war包加入到该镜像中</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">FROM tomcat:9-jre8</span><br><span class="line">RUN apt-get update \</span><br><span class="line">    &amp;&amp; apt-get install -y --no-install-recommends cowsay \</span><br><span class="line">    &amp;&amp; rm -rf /var/lib/apt/lists/*</span><br><span class="line">ENV PATH &quot;$PATH:/usr/games&quot;</span><br><span class="line"></span><br><span class="line">ADD ./target/Mybk-iteration3-0.0.1-SNAPSHOT.war /usr/local/tomcat/webapps/</span><br><span class="line"></span><br><span class="line">ENTRYPOINT [&quot;cowsay&quot;]</span><br><span class="line">CMD [&quot;Hello, World!&quot;]</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>自动化构建并发布image需要 <a href="https://docs.docker.com/registry/" target="_blank" rel="noopener">Docker Registry</a> ,在这里使用 <a href="https://hub.docker.com/" target="_blank" rel="noopener">Docker Hub</a>, 在使用前需要注册账户，创建 repo ，创建 automation 等操作,完成后类似下图：<img src="https://zztttt.github.io/picture/KuberneteDeployment/dockerRepo.jpg" alt="dockerRepo"> 右侧的指令可以 push 新构建的 image 到这个镜像仓库</p>
+</li>
+<li><p>构建运行发布新的docker image，注意tag的一致  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">before_script:</span><br><span class="line">  - docker build --tag fjjleon/bookstore .</span><br><span class="line">  - docker run fjjleon/bookstore</span><br><span class="line"></span><br><span class="line">······</span><br><span class="line"></span><br><span class="line">before_deploy:</span><br><span class="line">  - docker login -u &quot;$REGISTRY_USER&quot; -p &quot;$REGISTRY_PWD&quot;</span><br><span class="line"></span><br><span class="line">deploy:</span><br><span class="line">  provider: script</span><br><span class="line">  script: docker push fjjleon/bookstore</span><br><span class="line">  on:</span><br><span class="line">    branch: master</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>完成配置后，有新的代码变更时Travis.CI就会自动进行CICD，构建image发布到Docker Hub上。</p>
+</li>
+</ol>
+<ul>
+<li>PS: WEBAPP不是前后端分离的，配合k8s的部分会出现问题</li>
+</ul>
+<ol start="9">
+<li><p>修改webapp项目使其前后端分离，使用了 <strong>nginx</strong> 运行前端静态页面，其中涉及了<strong>跨域访问</strong>的问题，<del>这里配置了反向代理，由nginx服务器转发相应跨域访问请求。配置时注意会出现到端口号无法使用的情况，修改使用其他端口</del>，nginx反向代理存在问题，改为直接由ajax访问后端api，配合后端加入了cors的配置。详细配置文件见<a href="https://github.com/FJJLeon/k8s-bookstore-front/blob/master/nginx.conf">前端项目文件nginx.conf</a></p>
+</li>
+<li><p>类似后端项目的CICD配置过程，为前端项目添加CICD，其中项目打包脚本，Dockerfile需要作相应修改，使用 <strong>npm</strong> 打包项目，基础镜像使用 <strong>nginx</strong>，新建了docker hub仓库储存前端镜像。</p>
+</li>
+<li><p>暂时使用的mysql是Host的 mysql 服务，在mysql上安装MySQL服务,中间为root设置密码为 fangjj1998，否则可能jdbc还是无法访问。另外需要运行sql脚本导入数据</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install mysql-server</span><br><span class="line">可以执行 mysql_secure_installation 第一个 y， 后面全部回车</span><br><span class="line">systemctl status mysql.service</span><br><span class="line">mysql -u root --password &quot;fangjj1998&quot; &lt; all2.sql</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>在docker pull 之后要 docker run 时使用，使用了HOST的网段，做法不是很好，需要改进，或者加 (-d)以守护进程运行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo docker run -p 8200:8080 -p 3306:3306  --network=&quot;host&quot; fjjleon/bookstore</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>在浏览器访问 <a href="http://localhost:8080/Mybk-iteration3/#/" target="_blank" rel="noopener">http://localhost:8080/Mybk-iteration3/#/</a> 可以渲染出界面，但是点击 Get Books 在 Console 控制台看到了数据，但是没有渲染，考虑是浏览器问题</p>
+</li>
+<li><p>不使用nginx的反向代理，跨域访问需要在后端里加入 <strong>cors</strong> 的 <a href="https://github.com/FJJLeon/k8s-bookstore/blob/master/src/main/java/mybk3/config/CorsConfig.java">config</a></p>
+</li>
+<li><p>使用 Tomcat 运行 war 包以部署时，无论是访问静态网页还是访问api都要加上 war 包名，形如 [ip]:[port]/[war包名(不包括.war)]/[api]</p>
+</li>
+<li><p>数据库配置完成后在mysql的shell 可以直接手动复制粘贴初始化数据，注意账户与后端JDBC一致</p>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2></li>
+</ol>
+<ul>
+<li><a href="https://andidittrich.de/2017/06/travisci-setup-mysql-tablesdata-before-running-tests.html" target="_blank" rel="noopener">TravisCI: Setup MySQL Tables+Data before running Tests</a></li>
+<li><a href="https://docs.travis-ci.com/user/database-setup/#mysql" target="_blank" rel="noopener">Setting up Databases Travis.CI docs</a></li>
+<li><a href="https://coderwall.com/p/nyth7g/change-mysql-password-in-travis-ci" target="_blank" rel="noopener">Change MySQL password in Travis-CI</a></li>
+<li><a href="https://www.cnblogs.com/boshen-hzb/p/6400272.html" target="_blank" rel="noopener">dockerfile 介绍</a></li>
+<li><a href="https://medium.com/mobileforgood/coding-tips-patterns-for-continuous-integration-with-docker-on-travis-ci-9cedb8348a62" target="_blank" rel="noopener">Coding Tips: Patterns for Continuous Integration with Docker on Travis CI</a></li>
+<li><a href="https://www.cnblogs.com/gabrielchen/p/5066120.html" target="_blank" rel="noopener">用nginx的反向代理机制解决前端跨域问题</a></li>
+<li><a href="https://stackoverflow.com/questions/24319662/from-inside-of-a-docker-container-how-do-i-connect-to-the-localhost-of-the-mach" target="_blank" rel="noopener">From inside of a Docker container, how do I connect to the localhost of the machine?</a></li>
+<li><a href="https://www.baeldung.com/spring-boot-war-tomcat-deploy" target="_blank" rel="noopener">Deploy a Spring Boot WAR into a Tomcat Server</a></li>
+<li><a href="https://www.quora.com/How-can-I-run-SQL-file-in-Ubuntu" target="_blank" rel="noopener">How-can-I-run-SQL-file-in-Ubuntu</a></li>
+<li><a href="https://www.cnblogs.com/yuansc/p/9076604.html" target="_blank" rel="noopener">SpringBoot配置Cors解决跨域请求问题</a></li>
+</ul>
+<h2 id="在腾讯云服务器创建集群"><a href="#在腾讯云服务器创建集群" class="headerlink" title="在腾讯云服务器创建集群"></a>在腾讯云服务器创建集群</h2><ul>
+<li><p>服务器环境：  </p>
+<ul>
+<li>master节点：Ubuntu 16.04.1 LTS (GNU/Linux 2核 4G内存)  </li>
+<li>node节点：Ubuntu 16.04.1 LTS (GNU/Linux 1核 1G内存)</li>
+</ul>
+</li>
+<li><p>安装指定版本的docker：  </p>
+<pre><code>https://releases.rancher.com/install-docker/17.03.sh  
+卸载掉之前版本的docker后运行该脚本即可安装17.03版本的docker
+</code></pre></li>
+<li>配置ssh<br>ssh-keygen生成密匙，在/etc/hosts目录下加入其他节点的内网IP（因为腾讯云的主机同一个地区同一个用户是有内网连接的路由规则的）<br>在ssh-copy-id [hostname]将公匙发送给相应主机，此时就能免密ssh连接，即满足rke的需求</li>
+<li><p>配置rke config<br>rke的cluster.yml是一个高度集成的配置文件，通过./rke up –config [config-file]即可一键部署。config参数默认为同目录下的cluster.yml,可以手动设置。如果最后一行是 Finished building Kubernetes cluster successfully 代表集群创建成功。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">//cluster.yml</span><br><span class="line">nodes:</span><br><span class="line">- address: 172.17.16.6</span><br><span class="line">  user: ubuntu</span><br><span class="line">  role: [controlplane,etcd,worker]</span><br><span class="line">  ssh_key_path: ~/.ssh/id_rsa</span><br><span class="line">- address: 172.17.0.12</span><br><span class="line">  user: cse</span><br><span class="line">  role: [worker]</span><br><span class="line">  ssh_key_path: ~/.ssh/id_rsa</span><br><span class="line">network:</span><br><span class="line">plugin: flannel</span><br><span class="line">system_images:</span><br><span class="line">  flannel: rancher/coreos-flannel:v0.9.1</span><br><span class="line">```  </span><br><span class="line">创建成功后运行</span><br></pre></td></tr></table></figure>
+<p>cp kube_config_cluster.yml ${HOME}/.kube/config<br>chmod 777 ${HOME}/.kube/config</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">  这是将新生成的集群配置文件放入正确的位置，让知乎kubectl的使用免参数</span><br><span class="line">* 安装kubctl  </span><br><span class="line">  在官方提供的URL里下载即可：  </span><br><span class="line">  https://github.com/kubernetes/kubernetes/blob/master/CHANGELOG.md#client-binaries-1   </span><br><span class="line">  下载完成后，运行以下shell命令：</span><br></pre></td></tr></table></figure>
+<p>tar -zxvf kubernetes-client-linux-amd64.tar.gz<br>sudo mv /kubernetes/client/bin/kubectl /usr/local/bin/kubectl</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">此时就安装成功，使用方法如下：</span><br></pre></td></tr></table></figure>
+<p>  kubectl version<br>  kubectl get nodes//查看节点信息<br>  kubectl get pods,svc//查看pods与service情况<br>  kubectl apply -f [yaml-file]//部署应用</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">## 在kubernetes集群上部署应用</span><br><span class="line">  </span><br><span class="line"></span><br><span class="line">## 数据库部署：  </span><br><span class="line">使用deployment部署MySQL的pod，并对外暴露32000端口</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>IN MASTER:<br>kubectl apply -f mysql-dm.yaml<br>kubectl apply -f mysql-svc.yaml</p>
+<p>IN YOUR OWN COMPUTER:<br>mysql -h[Master’s public Ip] -P32000 -uroot -p[Mysql Password]</p>
+<p>mysql&gt; </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">然后进入MySQL命令行模式，输入sql脚本。</span><br><span class="line"></span><br><span class="line">## 前端部署：</span><br><span class="line">使用deployment对它进行部署，对外暴露32001端口。</span><br></pre></td></tr></table></figure>
+<p>IN MASTER:<br>kubectl apply -f front-dm.yaml<br>kubectl apply -f front-svc.yaml<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">## 后端部署：</span><br><span class="line">同样使用deployment进行部署,对外暴露32002端口  </span><br><span class="line">进行ingress配置，即将www.test.com时将流量转发给service，同时在自己的主机上 /etc/hosts文件里增加hosts-&gt;public IP的映射</span><br></pre></td></tr></table></figure></p>
+<p>IN MASTER:<br>kubectl apply -f back-ingress.yaml<br>kubectl apply -f back-dm-yaml<br>kubectl apply -f back-svc.yaml<br><code>`</code></p>
+<h2 id="Demo"><a href="#Demo" class="headerlink" title="Demo:"></a>Demo:</h2><p><img src="https://zztttt.github.io/picture/KuberneteDeployment/dep1.png" alt="avatar"></p>
+<p>then cleck button “Get Books”<br><img src="https://zztttt.github.io/picture/KuberneteDeployment/dep2.png" alt="avatar"></p>
+<p>于是现在实现了“deploy your web application on kubernetes”</p>
+<h1 id="Load-Balance"><a href="#Load-Balance" class="headerlink" title="Load Balance"></a>Load Balance</h1><h2 id="measure-the-reponse-time-of-different-scale"><a href="#measure-the-reponse-time-of-different-scale" class="headerlink" title="measure the reponse time of different scale"></a>measure the reponse time of different scale</h2><h1 id="初始状态：replica-1"><a href="#初始状态：replica-1" class="headerlink" title="初始状态：replica = 1"></a>初始状态：replica = 1</h1><p><img src="https://zztttt.github.io/picture/KuberneteDeployment/initconfig.jpg" alt="avatar"><br><img src="https://zztttt.github.io/picture/KuberneteDeployment/init.jpg" alt="avatar"></p>
+<h3 id="get-pods得到frontend1个pod"><a href="#get-pods得到frontend1个pod" class="headerlink" title="get pods得到frontend1个pod"></a>get pods得到frontend1个pod</h3><h3 id="此时使用jmeter加压，使用response-time-graph查看RPS增长情况-jmeter安装配置略"><a href="#此时使用jmeter加压，使用response-time-graph查看RPS增长情况-jmeter安装配置略" class="headerlink" title="此时使用jmeter加压，使用response time graph查看RPS增长情况 jmeter安装配置略"></a>此时使用jmeter加压，使用response time graph查看RPS增长情况 jmeter安装配置略</h3><h3 id="20s逐渐启动20个线程，循环访问test-32001端口获取前端，执行60s。"><a href="#20s逐渐启动20个线程，循环访问test-32001端口获取前端，执行60s。" class="headerlink" title="20s逐渐启动20个线程，循环访问test:32001端口获取前端，执行60s。"></a>20s逐渐启动20个线程，循环访问test:32001端口获取前端，执行60s。</h3><h3 id="得到其增长曲线如下"><a href="#得到其增长曲线如下" class="headerlink" title="得到其增长曲线如下"></a>得到其增长曲线如下</h3><p><img src="https://zztttt.github.io/picture/KuberneteDeployment/1rep.jpg" alt="avatar"></p>
+<h1 id="修改yaml文件后执行kubectl-apply-f-front-dm-yaml"><a href="#修改yaml文件后执行kubectl-apply-f-front-dm-yaml" class="headerlink" title="修改yaml文件后执行kubectl apply -f front_dm.yaml"></a>修改yaml文件后执行kubectl apply -f front_dm.yaml</h1><h1 id="replica-2重复以上步骤"><a href="#replica-2重复以上步骤" class="headerlink" title="replica=2重复以上步骤"></a>replica=2重复以上步骤</h1><p><img src="https://zztttt.github.io/picture/KuberneteDeployment/2init.jpg" alt="avatar"></p>
+<h2 id="结果如下"><a href="#结果如下" class="headerlink" title="结果如下"></a>结果如下</h2><p><img src="https://zztttt.github.io/picture/KuberneteDeployment/2rep.jpg" alt="avatar"></p>
+<h2 id="考虑网络波动和其他原因，我们关注曲线下方较平滑的位置，可见其平均RPS处于100ms左右，2pods明显低于1pod时的RPS。"><a href="#考虑网络波动和其他原因，我们关注曲线下方较平滑的位置，可见其平均RPS处于100ms左右，2pods明显低于1pod时的RPS。" class="headerlink" title="考虑网络波动和其他原因，我们关注曲线下方较平滑的位置，可见其平均RPS处于100ms左右，2pods明显低于1pod时的RPS。"></a>考虑网络波动和其他原因，我们关注曲线下方较平滑的位置，可见其平均RPS处于100ms左右，2pods明显低于1pod时的RPS。</h2><h1 id="replica-3重复以上步骤"><a href="#replica-3重复以上步骤" class="headerlink" title="replica=3重复以上步骤"></a>replica=3重复以上步骤</h1><p><img src="https://zztttt.github.io/picture/KuberneteDeployment/3init.jpg" alt="avatar"></p>
+<h2 id="结果如下-1"><a href="#结果如下-1" class="headerlink" title="结果如下"></a>结果如下</h2><p><img src="https://zztttt.github.io/picture/KuberneteDeployment/3rep.jpg" alt="avatar"></p>
+<h2 id="可见3pods时平均RPS略微低于2pods时的RPS，且更加平滑。"><a href="#可见3pods时平均RPS略微低于2pods时的RPS，且更加平滑。" class="headerlink" title="可见3pods时平均RPS略微低于2pods时的RPS，且更加平滑。"></a>可见3pods时平均RPS略微低于2pods时的RPS，且更加平滑。</h2><h2 id="故两个实例可以满足峰值情况下正常平均RPS不高于500ms。"><a href="#故两个实例可以满足峰值情况下正常平均RPS不高于500ms。" class="headerlink" title="故两个实例可以满足峰值情况下正常平均RPS不高于500ms。"></a>故两个实例可以满足峰值情况下正常平均RPS不高于500ms。</h2><h1 id="Requirement-5"><a href="#Requirement-5" class="headerlink" title="Requirement 5"></a>Requirement 5</h1><h3 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h3><p>使用jmeter创建500个线程，持续向前端发送http请求，此时replica个数为1，这时response time较高，且会出现error。在1分钟之后(21:25:11)手动将replica个数增加到2个，在第二个pod的启动过程中可以观察到response time出现波动，第二个pod的启动大约需要10秒钟。从图表可以看到，大约40秒之后(21:25:53)response time趋于稳定，稳定值明显低于一个pod的情况，由此证明手动scale起到了效果。后续又手动将pod的个数增加到5个，过程与之前类似，response time的稳定值比起2个pod的情况更低。 </p>
+<p>整个测试过程jmeter绘制的响应时间图如下所示<br><img src="https://zztttt.github.io/picture/KuberneteDeployment/test.png" alt="测试"></p>
+<p>要实现Autoscale可以通过创建hpa资源，使用如下命令：</p>
+<blockquote>
+<p>kubectl autoscale deployment front-dm –max=5 –cpu-percent=50      </p>
+</blockquote>
+<p>上面的命令指定replica个数在1个到5个之间，cpu的最高占用率为50%，即当cpu使用到达50%时开始通过增加pod的个数来scale up。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/zztttt.github.io/tags/k8s/" rel="tag"># k8s</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/zztttt.github.io/2019/01/01/hello-world/" rel="prev" title="Hello World">
+      <i class="fa fa-chevron-left"></i> Hello World
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/zztttt.github.io/2019/04/25/configuration/" rel="next" title="hexo主题的切换">
+      hexo主题的切换 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#prepare-a-CI-CD-environment"><span class="nav-number">1.</span> <span class="nav-text">prepare a CI/CD environment</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Prepare-a-web-app-build-contain-image"><span class="nav-number">2.</span> <span class="nav-text">Prepare a web app, build contain image</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Automatically-build-images-after-a-PR"><span class="nav-number">3.</span> <span class="nav-text">Automatically build images after a PR</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#搭建步骤"><span class="nav-number"></span> <span class="nav-text">搭建步骤</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Reference"><span class="nav-number"></span> <span class="nav-text">Reference</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#在腾讯云服务器创建集群"><span class="nav-number"></span> <span class="nav-text">在腾讯云服务器创建集群</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Demo"><span class="nav-number"></span> <span class="nav-text">Demo:</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Load-Balance"><span class="nav-number"></span> <span class="nav-text">Load Balance</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#measure-the-reponse-time-of-different-scale"><span class="nav-number"></span> <span class="nav-text">measure the reponse time of different scale</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#初始状态：replica-1"><span class="nav-number"></span> <span class="nav-text">初始状态：replica = 1</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#get-pods得到frontend1个pod"><span class="nav-number">1.</span> <span class="nav-text">get pods得到frontend1个pod</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#此时使用jmeter加压，使用response-time-graph查看RPS增长情况-jmeter安装配置略"><span class="nav-number">2.</span> <span class="nav-text">此时使用jmeter加压，使用response time graph查看RPS增长情况 jmeter安装配置略</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#20s逐渐启动20个线程，循环访问test-32001端口获取前端，执行60s。"><span class="nav-number">3.</span> <span class="nav-text">20s逐渐启动20个线程，循环访问test:32001端口获取前端，执行60s。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#得到其增长曲线如下"><span class="nav-number">4.</span> <span class="nav-text">得到其增长曲线如下</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#修改yaml文件后执行kubectl-apply-f-front-dm-yaml"><span class="nav-number"></span> <span class="nav-text">修改yaml文件后执行kubectl apply -f front_dm.yaml</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#replica-2重复以上步骤"><span class="nav-number"></span> <span class="nav-text">replica=2重复以上步骤</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#结果如下"><span class="nav-number"></span> <span class="nav-text">结果如下</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#考虑网络波动和其他原因，我们关注曲线下方较平滑的位置，可见其平均RPS处于100ms左右，2pods明显低于1pod时的RPS。"><span class="nav-number"></span> <span class="nav-text">考虑网络波动和其他原因，我们关注曲线下方较平滑的位置，可见其平均RPS处于100ms左右，2pods明显低于1pod时的RPS。</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#replica-3重复以上步骤"><span class="nav-number"></span> <span class="nav-text">replica=3重复以上步骤</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#结果如下-1"><span class="nav-number"></span> <span class="nav-text">结果如下</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#可见3pods时平均RPS略微低于2pods时的RPS，且更加平滑。"><span class="nav-number"></span> <span class="nav-text">可见3pods时平均RPS略微低于2pods时的RPS，且更加平滑。</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#故两个实例可以满足峰值情况下正常平均RPS不高于500ms。"><span class="nav-number"></span> <span class="nav-text">故两个实例可以满足峰值情况下正常平均RPS不高于500ms。</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Requirement-5"><span class="nav-number"></span> <span class="nav-text">Requirement 5</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#实验"><span class="nav-number">1.</span> <span class="nav-text">实验</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ZhangZhengtong</p>
+  <div class="site-description" itemprop="description">SE@SJTU</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/zztttt.github.io/archives/">
+        
+          <span class="site-state-item-count">32</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/zztttt.github.io/categories/">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/zztttt.github.io/tags/">
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZhangZhengtong</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/zztttt.github.io/lib/anime.min.js"></script>
+  <script src="/zztttt.github.io/lib/velocity/velocity.min.js"></script>
+  <script src="/zztttt.github.io/lib/velocity/velocity.ui.min.js"></script>
+<script src="/zztttt.github.io/js/utils.js"></script><script src="/zztttt.github.io/js/motion.js"></script>
+<script src="/zztttt.github.io/js/schemes/muse.js"></script>
+<script src="/zztttt.github.io/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

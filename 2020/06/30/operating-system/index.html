@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.8.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/zztttt.github.io/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/zztttt.github.io/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/zztttt.github.io/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/zztttt.github.io/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/zztttt.github.io/css/main.css">
+
+
+<link rel="stylesheet" href="/zztttt.github.io/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"github.com","root":"/zztttt.github.io/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="进程（process） 进程空间分布：一个进程内存分为五个segment，从高到低分别为（stack、heap、bss、data、text）segment 进程通信方式:   管道：父子与兄弟进程之间的通信，不是文件系统，存在于内存 FIFO：与进程类型无关的通信方式，以特殊的文件形式存在于文件系统中 消息队列：消息的链列表 信号量： 信号量+共享内存通常结合在一起使用，信号量用来同步对共享内存的">
+<meta name="keywords" content="operating system">
+<meta property="og:type" content="article">
+<meta property="og:title" content="operating system">
+<meta property="og:url" content="http://github.com/2020/06/30/operating-system/index.html">
+<meta property="og:site_name" content="zztttt">
+<meta property="og:description" content="进程（process） 进程空间分布：一个进程内存分为五个segment，从高到低分别为（stack、heap、bss、data、text）segment 进程通信方式:   管道：父子与兄弟进程之间的通信，不是文件系统，存在于内存 FIFO：与进程类型无关的通信方式，以特殊的文件形式存在于文件系统中 消息队列：消息的链列表 信号量： 信号量+共享内存通常结合在一起使用，信号量用来同步对共享内存的">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://zztttt.github.io/picture/operating-system/ELF.png">
+<meta property="og:updated_time" content="2022-08-13T10:01:38.570Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="operating system">
+<meta name="twitter:description" content="进程（process） 进程空间分布：一个进程内存分为五个segment，从高到低分别为（stack、heap、bss、data、text）segment 进程通信方式:   管道：父子与兄弟进程之间的通信，不是文件系统，存在于内存 FIFO：与进程类型无关的通信方式，以特殊的文件形式存在于文件系统中 消息队列：消息的链列表 信号量： 信号量+共享内存通常结合在一起使用，信号量用来同步对共享内存的">
+<meta name="twitter:image" content="https://zztttt.github.io/picture/operating-system/ELF.png">
+
+<link rel="canonical" href="http://github.com/2020/06/30/operating-system/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>operating system | zztttt</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/zztttt.github.io/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">zztttt</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/zztttt.github.io/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/zztttt.github.io/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope="" itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://github.com/2020/06/30/operating-system/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/zztttt.github.io/images/avatar.gif">
+      <meta itemprop="name" content="ZhangZhengtong">
+      <meta itemprop="description" content="SE@SJTU">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="zztttt">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          operating system
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-06-30 13:49:25" itemprop="dateCreated datePublished" datetime="2020-06-30T13:49:25+08:00">2020-06-30</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-08-13 18:01:38" itemprop="dateModified" datetime="2022-08-13T18:01:38+08:00">2022-08-13</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/zztttt.github.io/categories/zztttt/" itemprop="url" rel="index"><span itemprop="name">zztttt</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/zztttt.github.io/categories/interview/" itemprop="url" rel="index"><span itemprop="name">interview</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="进程（process）"><a href="#进程（process）" class="headerlink" title="进程（process）"></a>进程（process）</h2><ul>
+<li>进程空间分布：<br>一个进程内存分为五个segment，从高到低分别为（stack、heap、bss、data、text）segment</li>
+<li>进程通信方式:  <ul>
+<li>管道：父子与兄弟进程之间的通信，不是文件系统，存在于内存</li>
+<li>FIFO：与进程类型无关的通信方式，以特殊的文件形式存在于文件系统中</li>
+<li>消息队列：消息的链列表</li>
+<li>信号量： 信号量+共享内存通常结合在一起使用，信号量用来同步对共享内存的访问。<br>即bitmap，与IPC结构不同，它是一个计数器，用于进程间的互斥与同步，需要结合共享内存。<br>它基于operating system的PV操作，对信号量的操作都是原子操作，并且支持信号量组</li>
+<li>共享内存：<br>指两个或多个进程共享一个给定的存储区。<br>共享内存是最快的一种 IPC，因为进程是直接对内存进行存取。因为多个进程可以同时操作，所以需要进行同步。解除映射时才写回文件。<br><strong>优点</strong>：效率高。<strong>缺点</strong>：没有同步机制，需要信号量</li>
+</ul>
+</li>
+<li>进程资源的分配方式：<br>由<strong>PCB</strong>(process control block)管理，在32bit系统下，会分配4G内存，3G给用户，1G给内核。<br>内核态有一个task_struct，里面保存以下这些信息：  </li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>标识</td>
+<td>pid ppid</td>
+</tr>
+<tr>
+<td>file</td>
+<td>打开的文件信息，file descriptor</td>
+</tr>
+<tr>
+<td>memory</td>
+<td>内存指针，指向虚拟地址空间的信息</td>
+</tr>
+<tr>
+<td>context</td>
+<td>寄存器的值、进程状态、堆栈的内容</td>
+</tr>
+<tr>
+<td>signal</td>
+<td>是否还有待处理的信号</td>
+</tr>
+<tr>
+<td>I/O</td>
+<td>记录进程和各种I/O设备的交互</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>生命周期：<ul>
+<li>僵尸态： 子进程退出后，所有资源都消失了，只剩下 task_struct，父进程在 wait 函数中可以得到子进程的死亡原因。在 wait 之前子进程的状态就是僵尸态。</li>
+<li>深度睡眠： 等待资源到位后才醒过来</li>
+<li>浅度睡眠： 等待资源到位或收到信号后都会醒过来</li>
+<li>暂停： stop状态是被外部命令作业控制等强制进程进入的状态。</li>
+<li>就绪： 未占有 CPU，等待调度算法调度到运行态的进程</li>
+<li>运行：占有 CPU，正在运行的线程。</li>
+</ul>
+</li>
+<li>进程调度算法<ul>
+<li>FIFO</li>
+<li>SJF</li>
+<li>优先权</li>
+<li>轮转时间片</li>
+<li>多层队列：Linux默认调度算法</li>
+</ul>
+</li>
+<li>守护进程（daemon）：<br>是一类在后台运行的特殊进程，用于执行特定的系统任务。很多守护进程在系统引导的时候启动，并且一直运行直到系统关闭。另一些只在需要的时候才启动，完成任务后就自动结束。</li>
+</ul>
+<h2 id="线程"><a href="#线程" class="headerlink" title="线程"></a>线程</h2><ul>
+<li><p>线程的使用：</p>
+<ul>
+<li><p>C++-Linux：<br>pthread_join: 需要父线程调用，等待子线程执行完，回收资源。不然资源没法回收<br>pthread_detach: 在该线程运行结束后会<strong>自动释放</strong>所有资源。<br>pthread_cond_t: 必须在<strong>互斥锁</strong>的保护下使用相应的条件变量<br>阻塞在条件变量</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">pthread_mutex_lock(<span class="keyword">pthread_mutex_t</span> *mutex);</span><br><span class="line"><span class="keyword">while</span>(condition_is_false)&#123;</span><br><span class="line">    pthread_cond_wait(<span class="keyword">pthread_cond_t</span> *cv, <span class="keyword">pthread_mutex_t</span> *mutex);</span><br><span class="line">&#125;</span><br><span class="line">pthread_mutex_unlock(<span class="keyword">pthread_mutex_t</span> *mutex);</span><br></pre></td></tr></table></figure>
+<p>唤醒阻塞在某条件变量上的线程：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">pthread_cond_signal(<span class="keyword">pthread_cond_t</span> *cv); <span class="comment">//唤醒至少一个阻塞在该cond上的线程</span></span><br><span class="line">pthread_cond_broadcast(<span class="keyword">pthread_cond_t</span> *cv); <span class="comment">// 唤醒所有阻塞在该cond上的线程</span></span><br><span class="line"><span class="comment">//前者单播，后者广播</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>Java：<br>TODO</p>
+</li>
+</ul>
+</li>
+<li>线程池<br>事先将线程放到一个容器中，当使用线程的时候，不用再去new出一个线程，直接从线程池取出来<br>优点：  <ul>
+<li>降低资源消耗：即重复利用线程池中的线程可以节省线程创建和销毁带来的消耗  </li>
+<li>提高性能：当任务需求时，可以不用创建线程直接执行，主要是直接从线程池中取出线程去执行  </li>
+<li>提高线程的可管理性：线程是稀缺资源，而且也是任务中不可少的资源，如果频繁的且无限制的创建会消耗系统资源，降低系统稳定性导致系统崩溃，内存溢出等等问题</li>
+</ul>
+</li>
+<li>线程安全<br>多线程访问同一代码，不会产生不确定的结果。编写线程安全的代码是低依靠<strong>线程同步</strong>。<br>线程安全的类：<strong>StringBuffer</strong>， <strong>HashTable</strong>， <strong>Vector</strong><br>线程不安全的类：<strong>StringBuilder</strong>（速度更快），<strong>HashMap</strong></li>
+<li>控制线程执行顺序：<ul>
+<li>信号量：signal，就上述关于pthread相关的函数</li>
+<li>sem_post:<br>sem_t为一个变量，post是给她+1，wait如果它是0则阻塞，非0则-1<br>例：初始化为0，线程1 wait直接阻塞，线程2 执行结束post给它加一，线程1则开始执行</li>
+</ul>
+</li>
+</ul>
+<h2 id="进程（process）与线程（thread）"><a href="#进程（process）与线程（thread）" class="headerlink" title="进程（process）与线程（thread）"></a>进程（process）与线程（thread）</h2><p>线程是进程的一个执行流，一个进程可以由很多个线程组成  </p>
+<table>
+<thead>
+<tr>
+<th>进程</th>
+<th>线程</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>资源分配</strong>的最小单位</td>
+<td><strong>程序执行</strong>的最小单位</td>
+</tr>
+<tr>
+<td>数据分开，需要IPC。共享复杂，同步简单</td>
+<td>共享简单，同步复杂</td>
+</tr>
+<tr>
+<td>占用内存多，切换复杂，CPU利用低</td>
+<td>占用内存少，切换简单，CPU利用率高</td>
+</tr>
+<tr>
+<td>编程简单调试简单</td>
+<td>难</td>
+</tr>
+<tr>
+<td>进程之间不会相互影响</td>
+<td>一个线程挂掉将导致整个进程挂掉</td>
+</tr>
+<tr>
+<td>分布式扩展到多台电脑比较简单</td>
+<td>适用于多核分布</td>
+</tr>
+<tr>
+<td>创建/销毁代价高</td>
+<td>低</td>
+</tr>
+<tr>
+<td>有独立的地址空间</td>
+<td>多个线程共享同一个进程的地址空间</td>
+</tr>
+</tbody>
+</table>
+<h2 id="Linux系统"><a href="#Linux系统" class="headerlink" title="Linux系统"></a>Linux系统</h2><ul>
+<li>ELF文件：是一种文件格式。可执行文件、目标文件、共享库和核心转储。由四部分组成<ul>
+<li>ELF header</li>
+<li>Program header table</li>
+<li>Section</li>
+<li>Section header table<br><img src="https://zztttt.github.io/picture/operating-system/ELF.png" alt="ELF"><br>TODO: 其大小与程序中全局变量是否初始化有什么关系（注意未初始化的数据放在bss段）bss在一开始全部清零</li>
+</ul>
+</li>
+<li>系统调用和库函数  </li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>系统调用</th>
+<th>库函数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>操作系统为用户提供的一系列操作的接口</td>
+<td>对系统调用的一层封装</td>
+</tr>
+<tr>
+<td>线程安全</td>
+<td>非线程安全</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>临界区：<br>在任意时刻只允许一个线程对共享资源进行访问。<br>如果有多个线程试图同时访问临界区，那么在有一个线程进入后其他所有试图访问此临界区的线程将被挂起，并一直持续到进入临界区的线程离开。<br>临界区在被释放后，其他线程可以继续抢占，并以此达到用原子方式操作共享资源的目的。</li>
+<li>内存管理机制：<br>虚拟地址、物理地址、逻辑地址。虚拟地址和物理地址之间采用<strong>多级页表</strong>映射</li>
+<li>页面置换算法：<ul>
+<li>FIFO：只是在按<strong>线性顺序</strong>访问地址空间时才是理想的，否则效率不高</li>
+<li>LRU：<ul>
+<li>优点：命中率,当存在热点数据时,LRU的效率很好；实现相对简单</li>
+<li>缺点：偶发性的,周期性的批量操作会导致LRU命中率急剧下降,缓存污染情况比较严重；命中时需要遍历链表,找到命中的数据块索引,然后需要将数据移到头部</li>
+</ul>
+</li>
+<li>LFU</li>
+<li>CLOCK：LRU算法的近似实现</li>
+<li>OPT：最佳置换算法，实际上不可能实现。每个页面都可以用在该页面首次被访问前所要执行的指令数进行标记。最佳页面置换算法只是简单地规定：标记最大的页应该被置换。</li>
+</ul>
+</li>
+<li>同步机制：<ul>
+<li>每个cpu一个变量</li>
+<li>原子操作：PV</li>
+<li>自旋锁：锁住一块临界区，进入时需要获取自旋锁。<br>读写自旋锁：允许多个进程同时对同一数据结构进行<strong>读</strong>，但不允许多个进程同时<strong>修改</strong>同一数据结构，因此在实现上必须分为读锁和写锁。  </li>
+<li>顺序锁：写锁不会因为读锁而锁住</li>
+<li>信号量：存在一个进程等待队列，未获取锁的进程将挂到该队列中，然后主动调用schedule()切换进程，让出cpu</li>
+<li>禁止本地中断</li>
+</ul>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>读锁</th>
+<th>写锁</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>实现<strong>多个进程</strong>能同时读同一数据结构，但是读的过程中不允许写</td>
+<td>实现仅能有<strong>一个</strong>进程获取写锁进入临界区，获取写锁时同时保证没有进程已经获取读锁</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>链接：<br>分为动态链接和静态链接。<br>动态链接生成可执行文件时不将所需函数链接到一个文件，而是要用的时候从系统ddl里面找。静态链接就是把所有文件都放入exe里面</li>
+<li>文件系统：ext2 ext3 ext4。。。</li>
+</ul>
+<h2 id="锁"><a href="#锁" class="headerlink" title="锁"></a>锁</h2><ul>
+<li>可重入锁（递归锁）：<ul>
+<li>在同一个线程在外层方法获取锁的时候，再进入该线程的内层方法会自动获取锁（前提锁对象的是同一个对象或者class），不会因为之前已经获取过还没释放而阻塞</li>
+<li>可重入锁可以让当前进程再次获取锁，不可重入锁会直接获取失败导致阻塞。可以<strong>一定程度</strong>避免死锁。</li>
+<li>加锁：先尝试获取并更新status的值，如果为0表示没有其他的线程占用，将其置为1；若不为0，则判断是否是当前线程在占有锁，如果是，status++，并再次获取锁，不是则导致获取锁失败，阻塞</li>
+<li>解锁：先获取status值，如果是当前线程战有锁，如果status == 1，则置为0并释放，否则status–，不释放。</li>
+</ul>
+</li>
+<li>乐观锁/悲观锁：</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>乐观锁</th>
+<th>悲观锁</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>每次拿数据的时候认为别人不会改，所以不会锁</td>
+<td>每次拿数据都会锁</td>
+</tr>
+<tr>
+<td>适用于<strong>多读</strong>（在拿数据时会判断是否有人改数据）</td>
+<td></td>
+</tr>
+<tr>
+<td>java.util.concurrent.atomic</td>
+<td>synchronized、ReentrantLock</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>生产者消费者模型：<br>生产者：生产消费者需要的资料。消费者：把资料做成产品<ul>
+<li>生产者生产数据到缓冲区中，消费者从缓冲区中取数据</li>
+<li>如果缓冲区已经满了，则生产者线程阻塞</li>
+<li>如果缓冲区为空，那么消费者线程阻塞</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/zztttt.github.io/tags/operating-system/" rel="tag"># operating system</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/zztttt.github.io/2020/06/29/Cpp/" rel="prev" title="C/C++">
+      <i class="fa fa-chevron-left"></i> C/C++
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/zztttt.github.io/2020/07/01/computer-network/" rel="next" title="computer network">
+      computer network <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#进程（process）"><span class="nav-number">1.</span> <span class="nav-text">进程（process）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#线程"><span class="nav-number">2.</span> <span class="nav-text">线程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#进程（process）与线程（thread）"><span class="nav-number">3.</span> <span class="nav-text">进程（process）与线程（thread）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Linux系统"><span class="nav-number">4.</span> <span class="nav-text">Linux系统</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#锁"><span class="nav-number">5.</span> <span class="nav-text">锁</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ZhangZhengtong</p>
+  <div class="site-description" itemprop="description">SE@SJTU</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/zztttt.github.io/archives/">
+        
+          <span class="site-state-item-count">32</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/zztttt.github.io/categories/">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/zztttt.github.io/tags/">
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZhangZhengtong</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/zztttt.github.io/lib/anime.min.js"></script>
+  <script src="/zztttt.github.io/lib/velocity/velocity.min.js"></script>
+  <script src="/zztttt.github.io/lib/velocity/velocity.ui.min.js"></script>
+<script src="/zztttt.github.io/js/utils.js"></script><script src="/zztttt.github.io/js/motion.js"></script>
+<script src="/zztttt.github.io/js/schemes/muse.js"></script>
+<script src="/zztttt.github.io/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

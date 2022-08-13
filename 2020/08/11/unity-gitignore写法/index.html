@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.8.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/zztttt.github.io/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/zztttt.github.io/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/zztttt.github.io/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/zztttt.github.io/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/zztttt.github.io/css/main.css">
+
+
+<link rel="stylesheet" href="/zztttt.github.io/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"github.com","root":"/zztttt.github.io/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="Unity目录结构123456789101112131415161718使用tree &amp;gt; tree.txt查看目录列表，tree /f &amp;gt; tree.txt查看所有目录及文件├─Assets│  └─Scenes├─Library│  ├─APIUpdater│  ├─Artifacts│  ├─ChinaEditorCache│  ├─PackageCache│  ├─ScriptA">
+<meta name="keywords" content="git,csharp,unity,programming">
+<meta property="og:type" content="article">
+<meta property="og:title" content="unity: gitignore写法">
+<meta property="og:url" content="http://github.com/2020/08/11/unity-gitignore写法/index.html">
+<meta property="og:site_name" content="zztttt">
+<meta property="og:description" content="Unity目录结构123456789101112131415161718使用tree &amp;gt; tree.txt查看目录列表，tree /f &amp;gt; tree.txt查看所有目录及文件├─Assets│  └─Scenes├─Library│  ├─APIUpdater│  ├─Artifacts│  ├─ChinaEditorCache│  ├─PackageCache│  ├─ScriptA">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2022-08-13T10:01:38.570Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="unity: gitignore写法">
+<meta name="twitter:description" content="Unity目录结构123456789101112131415161718使用tree &amp;gt; tree.txt查看目录列表，tree /f &amp;gt; tree.txt查看所有目录及文件├─Assets│  └─Scenes├─Library│  ├─APIUpdater│  ├─Artifacts│  ├─ChinaEditorCache│  ├─PackageCache│  ├─ScriptA">
+
+<link rel="canonical" href="http://github.com/2020/08/11/unity-gitignore写法/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>unity: gitignore写法 | zztttt</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/zztttt.github.io/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">zztttt</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/zztttt.github.io/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/zztttt.github.io/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope="" itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://github.com/2020/08/11/unity-gitignore写法/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/zztttt.github.io/images/avatar.gif">
+      <meta itemprop="name" content="ZhangZhengtong">
+      <meta itemprop="description" content="SE@SJTU">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="zztttt">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          unity: gitignore写法
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-08-11 16:07:38" itemprop="dateCreated datePublished" datetime="2020-08-11T16:07:38+08:00">2020-08-11</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-08-13 18:01:38" itemprop="dateModified" datetime="2022-08-13T18:01:38+08:00">2022-08-13</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/zztttt.github.io/categories/zztttt/" itemprop="url" rel="index"><span itemprop="name">zztttt</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="Unity目录结构"><a href="#Unity目录结构" class="headerlink" title="Unity目录结构"></a>Unity目录结构</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">使用tree &gt; tree.txt查看目录列表，tree /f &gt; tree.txt查看所有目录及文件</span><br><span class="line"></span><br><span class="line">├─Assets</span><br><span class="line">│  └─Scenes</span><br><span class="line">├─Library</span><br><span class="line">│  ├─APIUpdater</span><br><span class="line">│  ├─Artifacts</span><br><span class="line">│  ├─ChinaEditorCache</span><br><span class="line">│  ├─PackageCache</span><br><span class="line">│  ├─ScriptAssemblies</span><br><span class="line">│  ├─ShaderCache</span><br><span class="line">│  ├─StateCache</span><br><span class="line">│  └─TempArtifacts</span><br><span class="line">├─Logs</span><br><span class="line">├─Packages</span><br><span class="line">├─ProjectSettings</span><br><span class="line">└─Temp</span><br><span class="line">    └─ProcessJobs</span><br></pre></td></tr></table></figure>
+<p>主要有四个不同的目录，Assets、Library、ProjectSetting、Temp和几个脚本相关文件</p>
+<a id="more"></a>
+<h2 id="Assets-Directory"><a href="#Assets-Directory" class="headerlink" title="Assets Directory"></a>Assets Directory</h2><p>主要是所有的 C# 文件和任何其他游戏的objects，例如 3D 模型、 2D 纹理和声音的会在在此目录中的某个地方。<br>一般分为以下几个子目录：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">├─Effects</span><br><span class="line">├─Meshes</span><br><span class="line">├─Scripts</span><br><span class="line">├─Sounds</span><br></pre></td></tr></table></figure></p>
+<h2 id="Library-Directory"><a href="#Library-Directory" class="headerlink" title="Library Directory"></a>Library Directory</h2><p>包含unity3D使用tie assets和逻辑一起在scenes的引用关系。还有editor preferences、 platform settings和游戏引擎需要的许多其他设定。用户需要去这里做出任何修改是非常罕见的，所以最好是避免摆弄此目录的内容。</p>
+<h2 id="Project-Settings-Directory"><a href="#Project-Settings-Directory" class="headerlink" title="Project Settings Directory"></a>Project Settings Directory</h2><p>当任何asset资产导入到Unity3D 时，它经历了一种filter筛选器和setup。大多数情况下，使用 3D 模型和纹理时，他们是游戏的之前准备，必须采取的地方。Unity3D将所有这一切会自动执行</p>
+<h2 id="Temp-Directory"><a href="#Temp-Directory" class="headerlink" title="Temp Directory"></a>Temp Directory</h2><p>数据缓存（Data caches），写入临时文件和其他操作系统维护相关的东西就扔到 Temp 目录。Unity3D 是一个复杂的系统，由许多不同的组件组成。一切都很好，一起流动还有大量的临时工作。</p>
+<h2 id="gitignore文件写法"><a href="#gitignore文件写法" class="headerlink" title="gitignore文件写法"></a>gitignore文件写法</h2><p>首先可以直接找模板。<a href="https://www.toptal.com/developers/gitignore" target="_blank" rel="noopener">gitignore.io</a> 这个网站给了很完整的模板，输入unity就可以找到了。<br>但是实际上并不需要那么多<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">/[Ll]ibrary/</span><br><span class="line">/[Tt]emp/</span><br><span class="line">/[Oo]bj/</span><br><span class="line">/[Bb]uild/</span><br><span class="line">/[Bb]uilds/</span><br><span class="line">/[Pp]rojectSettings/ProjectVersion.txt</span><br><span class="line">/Assets/AssetStoreTools*</span><br><span class="line"></span><br><span class="line"># Autogenerated VS/MD solution and project files</span><br><span class="line">ExportedObj/</span><br><span class="line">*.csproj</span><br><span class="line">*.unityproj</span><br><span class="line">*.sln</span><br><span class="line">*.suo</span><br><span class="line">*.tmp</span><br><span class="line">*.user</span><br><span class="line">*.userprefs</span><br><span class="line">*.pidb</span><br><span class="line">*.booproj</span><br><span class="line">*.svd</span><br><span class="line"></span><br><span class="line"># Unity3D generated meta files</span><br><span class="line">*.pidb.meta</span><br><span class="line"></span><br><span class="line"># Unity3D Generated File On Crash Reports</span><br><span class="line">sysinfo.txt</span><br><span class="line"></span><br><span class="line"># Builds</span><br><span class="line">*.apk</span><br><span class="line">*.unitypackage</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">#  1  #号后面写的是注释，我们就是注释</span><br><span class="line">#  2  /号后面写需要忽略的文件夹名或文件名，例如：</span><br><span class="line"></span><br><span class="line">/Library/</span><br><span class="line"></span><br><span class="line">#这表示忽略根目录下Library这个文件夹，此文件夹下的所有文件都会被版本管理系统忽略</span><br><span class="line">#  3  []号，例子：</span><br><span class="line"></span><br><span class="line">/[Ll]ibrary/</span><br><span class="line"></span><br><span class="line">#等同于：</span><br><span class="line"></span><br><span class="line">/Library/</span><br><span class="line">/library/</span><br><span class="line"></span><br><span class="line">#  4  如果只需忽略某个特定文件，这样写：</span><br><span class="line"></span><br><span class="line">/[Pp]rojectSettings/ProjectVersion.txt</span><br><span class="line"></span><br><span class="line">#这表示根目录下ProjectSettings以及projectSettings文件夹下的ProjectVersion.txt会被版本管理系统忽略</span><br><span class="line">#最好使用完全相同的版本，版本相差太大的话要忽略的就不只是一个文件了</span><br><span class="line">#  5  *号后面写文件后缀，表示需要忽略的文件类型，例如：</span><br><span class="line"></span><br><span class="line">*.csproj</span><br><span class="line"></span><br><span class="line">#这表示文件类型为 csproj 的文件会被忽略</span><br><span class="line">#  6  如果一个文件名前面没有任何符号，例如：</span><br><span class="line"></span><br><span class="line">sysinfo.txt</span><br><span class="line"></span><br><span class="line">#表示不管在哪一个目录下，这个文件都会被忽略</span><br></pre></td></tr></table></figure>
+<p>最后，对于小型项目，直接用下面这几个感觉就OK了<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">Library/</span><br><span class="line"></span><br><span class="line">Temp/</span><br><span class="line"></span><br><span class="line">*.sln</span><br><span class="line"></span><br><span class="line">*.csproj</span><br><span class="line"></span><br><span class="line">*.userprefs</span><br><span class="line"></span><br><span class="line">*.unityproj</span><br><span class="line"></span><br><span class="line">*.DS_Store</span><br></pre></td></tr></table></figure></p>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><p><a href="https://blog.csdn.net/baidu_28372709/article/details/45891013" target="_blank" rel="noopener">新建Unity项目后包含的文件路径都是什么？</a><br><a href="https://www.jianshu.com/p/d132b5d485cd" target="_blank" rel="noopener">Unity git 忽略文件.gitignore</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/zztttt.github.io/tags/git/" rel="tag"># git</a>
+              <a href="/zztttt.github.io/tags/csharp/" rel="tag"># csharp</a>
+              <a href="/zztttt.github.io/tags/unity/" rel="tag"># unity</a>
+              <a href="/zztttt.github.io/tags/programming/" rel="tag"># programming</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/zztttt.github.io/2020/08/09/百度之星程序设计大赛-复赛/" rel="prev" title="百度之星程序设计大赛-复赛">
+      <i class="fa fa-chevron-left"></i> 百度之星程序设计大赛-复赛
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/zztttt.github.io/2020/08/12/unity-Cube/" rel="next" title="unity: 平衡球">
+      unity: 平衡球 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Unity目录结构"><span class="nav-number">1.</span> <span class="nav-text">Unity目录结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Assets-Directory"><span class="nav-number">2.</span> <span class="nav-text">Assets Directory</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Library-Directory"><span class="nav-number">3.</span> <span class="nav-text">Library Directory</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Project-Settings-Directory"><span class="nav-number">4.</span> <span class="nav-text">Project Settings Directory</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Temp-Directory"><span class="nav-number">5.</span> <span class="nav-text">Temp Directory</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#gitignore文件写法"><span class="nav-number">6.</span> <span class="nav-text">gitignore文件写法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Reference"><span class="nav-number">7.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ZhangZhengtong</p>
+  <div class="site-description" itemprop="description">SE@SJTU</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/zztttt.github.io/archives/">
+        
+          <span class="site-state-item-count">32</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/zztttt.github.io/categories/">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/zztttt.github.io/tags/">
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZhangZhengtong</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/zztttt.github.io/lib/anime.min.js"></script>
+  <script src="/zztttt.github.io/lib/velocity/velocity.min.js"></script>
+  <script src="/zztttt.github.io/lib/velocity/velocity.ui.min.js"></script>
+<script src="/zztttt.github.io/js/utils.js"></script><script src="/zztttt.github.io/js/motion.js"></script>
+<script src="/zztttt.github.io/js/schemes/muse.js"></script>
+<script src="/zztttt.github.io/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

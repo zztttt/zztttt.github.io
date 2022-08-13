@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.8.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/zztttt.github.io/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/zztttt.github.io/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/zztttt.github.io/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/zztttt.github.io/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/zztttt.github.io/css/main.css">
+
+
+<link rel="stylesheet" href="/zztttt.github.io/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"github.com","root":"/zztttt.github.io/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="目的在Windows环境下使用makefile来编译C++，而不是在Linux系统中。虚拟机开得太烦了 准备材料 VSCode：官网下载就OK，没什么好说的 MinGW  MinGW配置 下载压缩包：不应该直接点击Download Latest Version，不然下载下来的我也不知道怎么用….应该进入https://sourceforge.net/projects/mingw-w64/files">
+<meta name="keywords" content="cpp,vscode">
+<meta property="og:type" content="article">
+<meta property="og:title" content="VSCode: Windows下基于makefile的C++编译">
+<meta property="og:url" content="http://github.com/2020/07/06/VSCode-Windows下基于makefile的C-编译/index.html">
+<meta property="og:site_name" content="zztttt">
+<meta property="og:description" content="目的在Windows环境下使用makefile来编译C++，而不是在Linux系统中。虚拟机开得太烦了 准备材料 VSCode：官网下载就OK，没什么好说的 MinGW  MinGW配置 下载压缩包：不应该直接点击Download Latest Version，不然下载下来的我也不知道怎么用….应该进入https://sourceforge.net/projects/mingw-w64/files">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://zztttt.cn/picture/VSCode-cppInWindows/MinGW.png">
+<meta property="og:image" content="https://zztttt.cn/picture/VSCode-cppInWindows/1.png">
+<meta property="og:image" content="https://zztttt.cn/picture/VSCode-cppInWindows/2.png">
+<meta property="og:updated_time" content="2022-08-13T10:01:38.570Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="VSCode: Windows下基于makefile的C++编译">
+<meta name="twitter:description" content="目的在Windows环境下使用makefile来编译C++，而不是在Linux系统中。虚拟机开得太烦了 准备材料 VSCode：官网下载就OK，没什么好说的 MinGW  MinGW配置 下载压缩包：不应该直接点击Download Latest Version，不然下载下来的我也不知道怎么用….应该进入https://sourceforge.net/projects/mingw-w64/files">
+<meta name="twitter:image" content="https://zztttt.cn/picture/VSCode-cppInWindows/MinGW.png">
+
+<link rel="canonical" href="http://github.com/2020/07/06/VSCode-Windows下基于makefile的C-编译/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>VSCode: Windows下基于makefile的C++编译 | zztttt</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/zztttt.github.io/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">zztttt</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/zztttt.github.io/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/zztttt.github.io/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope="" itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://github.com/2020/07/06/VSCode-Windows下基于makefile的C-编译/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/zztttt.github.io/images/avatar.gif">
+      <meta itemprop="name" content="ZhangZhengtong">
+      <meta itemprop="description" content="SE@SJTU">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="zztttt">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          VSCode: Windows下基于makefile的C++编译
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-07-06 14:49:16" itemprop="dateCreated datePublished" datetime="2020-07-06T14:49:16+08:00">2020-07-06</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-08-13 18:01:38" itemprop="dateModified" datetime="2022-08-13T18:01:38+08:00">2022-08-13</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="目的"><a href="#目的" class="headerlink" title="目的"></a>目的</h2><p>在Windows环境下使用makefile来编译C++，而不是在Linux系统中。虚拟机开得太烦了</p>
+<h2 id="准备材料"><a href="#准备材料" class="headerlink" title="准备材料"></a>准备材料</h2><ul>
+<li>VSCode：官网下载就OK，没什么好说的</li>
+<li>MinGW</li>
+</ul>
+<h2 id="MinGW配置"><a href="#MinGW配置" class="headerlink" title="MinGW配置"></a>MinGW配置</h2><ul>
+<li>下载压缩包：<br>不应该直接点击<strong>Download Latest Version</strong>，不然下载下来的我也不知道怎么用….<br>应该进入<a href="https://sourceforge.net/projects/mingw-w64/files/" target="_blank" rel="noopener">https://sourceforge.net/projects/mingw-w64/files/</a>，然后滑到下面，点击url<br><img src="https://zztttt.cn/picture/VSCode-cppInWindows/MinGW.png" alt="MinGW"><br>这时会得到一个名字为<strong>x86_64-8.1.0-release-posix-seh-rt_v6-rev0.7z</strong>的7z类型压缩包，这就是gcc-8.1.0，将其解压，得到包含MinGW的文件夹。  </li>
+<li>配置环境变量<br>在<strong>XX用户变量和系统变量</strong>里的<strong>Path</strong>里添加入MinGW/bin的绝对路径。<br>win+R后，输入cmd，打开terminal，输入g++或者gcc，如果出现以下log说明配置成功。最好重启一下<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">g++: fatal error: no input files</span><br><span class="line">compilation terminated.</span><br><span class="line"></span><br><span class="line">gcc: fatal error: no input files</span><br><span class="line">compilation terminated.</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="在VSCode中编写"><a href="#在VSCode中编写" class="headerlink" title="在VSCode中编写"></a>在VSCode中编写</h2><p>首先要知道各种替换变量的意思。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">$&#123;workspaceFolder&#125; - the path of the folder opened in VS Code</span><br><span class="line">$&#123;workspaceRootFolderName&#125; - the name of the folder opened in VS Code without any slashes (/)</span><br><span class="line">$&#123;file&#125; - the current opened file</span><br><span class="line">$&#123;relativeFile&#125; - the current opened file relative to workspaceRoot</span><br><span class="line">$&#123;fileBasename&#125; - the current opened file&apos;s basename</span><br><span class="line">$&#123;fileBasenameNoExtension&#125; - the current opened file&apos;s basename with no file extension</span><br><span class="line">$&#123;fileDirname&#125; - the current opened file&apos;s dirname</span><br><span class="line">$&#123;fileExtname&#125; - the current opened file&apos;s extension</span><br><span class="line">$&#123;cwd&#125; - the task runner&apos;s current working directory on startup</span><br><span class="line">$&#123;lineNumber&#125; - the current selected line number in the active file</span><br></pre></td></tr></table></figure></p>
+<p><strong>tasks.json</strong>用于在launch前执行任务，<strong>launch.json</strong>用于读取执行文件</p>
+<ul>
+<li><p>不使用第三方插件，且只编译单个cpp文件<br>首先创建<strong>launch.json</strong>文件，方法如下所示，选择第一个即可<br><img src="https://zztttt.cn/picture/VSCode-cppInWindows/1.png" alt="1">  </p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">&#123;   //launch.json</span><br><span class="line">    "version": "0.2.0",</span><br><span class="line">    "configurations": [</span><br><span class="line">        &#123;</span><br><span class="line">            "name": "g++.exe build and debug active file", //代表任务的名字</span><br><span class="line">            "type": "cppdbg",</span><br><span class="line">            "request": "launch",</span><br><span class="line">            "program": "$&#123;fileDirname&#125;\\$&#123;fileBasenameNoExtension&#125;.exe", //执行 经过task.json编译完后的exe文件？？</span><br><span class="line">            "args": [],</span><br><span class="line">            "stopAtEntry": false, //选为true则会在打开控制台后停滞，暂时不执行程序</span><br><span class="line">            "cwd": "$&#123;workspaceFolder&#125;",//当前工作路径：当前文件所在的工作空间</span><br><span class="line">            "environment": [],</span><br><span class="line">            "externalConsole": false,//是否使用外部控制台</span><br><span class="line">            "MIMode": "gdb",</span><br><span class="line">            "miDebuggerPath": "D:\\tools\\compiler\\mingw64-posix-seh\\bin\\gdb.exe",</span><br><span class="line">            "setupCommands": [</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="attr">"description"</span>: <span class="string">"Enable pretty-printing for gdb"</span>,</span><br><span class="line">                    <span class="attr">"text"</span>: <span class="string">"-enable-pretty-printing"</span>,</span><br><span class="line">                    <span class="attr">"ignoreFailures"</span>: <span class="literal">true</span></span><br><span class="line">                &#125;</span><br><span class="line">            ],</span><br><span class="line">            "preLaunchTask": "task g++" // must be same to the label in task.json.json</span><br><span class="line">        &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>然后点击F5，会弹出找不到task.json的错误，直接利用提示新建一个即可。  </p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">&#123;   //task.json</span><br><span class="line">    "version": "2.0.0",</span><br><span class="line">    "tasks": [</span><br><span class="line">        &#123;</span><br><span class="line">            "label": "task g++", // must be same to preLaunchTask in launch.json</span><br><span class="line">            "type": "shell",</span><br><span class="line">            "command": "g++",</span><br><span class="line">            "args": [</span><br><span class="line">                "'-Wall'",</span><br><span class="line">                "'-std=c++17'",  //使用c++17标准编译</span><br><span class="line">                "'$&#123;file&#125;'", //当前文件名</span><br><span class="line">                "-o", //对象名，不进行编译优化</span><br><span class="line">                <span class="string">"'$&#123;fileBasenameNoExtension&#125;.exe'"</span></span><br><span class="line">                //g++ -Wall -std=c++17 filename.cpp -o filename.exe</span><br><span class="line">            ],</span><br><span class="line">            "group": &#123;</span><br><span class="line">                "kind": "build",</span><br><span class="line">                "isDefault": true</span><br><span class="line">            &#125;,</span><br><span class="line">            "problemMatcher": [</span><br><span class="line">                <span class="string">"$gcc"</span></span><br><span class="line">            ]</span><br><span class="line">        &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>然后有一个特别关键的点！不要让<strong>task.json</strong>或者<strong>launch.json</strong>处于active状态！！！否则会报下面错误：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">...\.vscode\tasks.json: file format not recognized; treating as linker script</span><br><span class="line">...\.vscode\tasks.json:1: syntax error</span><br></pre></td></tr></table></figure>
+<p>上面的意思是把task.json文件当做cpp源文件来编译了，因为上面的<strong>args</strong>里面的${file}代表当前处于active状态的文件！正确的做法是下面这样：<br><img src="https://zztttt.cn/picture/VSCode-cppInWindows/2.png" alt="2"><br>最后直接Run就OK了~</p>
+</li>
+<li>不使用第三方插件，且编译多个cpp文件<br>此时就需要学习使用<strong>makefile</strong>或者<strong>cmake</strong>了，然后把tasks的命令改成调用make等。</li>
+</ul>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><p><a href="https://zhuanlan.zhihu.com/p/92175757" target="_blank" rel="noopener">VScode tasks.json和launch.json的设置</a><br><a href="https://stackoverflow.com/questions/53452389/compilling-c-in-visual-studio-code-on-ubuntu" target="_blank" rel="noopener">Compilling C++ in visual studio code on Ubuntu</a><br><a href="https://code.visualstudio.com/docs/cpp/config-mingw" target="_blank" rel="noopener">Visualstudio Code Doc: Using GCC with MinGW</a><br><a href="https://blog.csdn.net/bat67/article/details/78302871" target="_blank" rel="noopener">各种替换变量的意思</a><br><a href="https://www.zhihu.com/question/30315894/answer/154979413" target="_blank" rel="noopener">Visual Studio Code 如何编写运行 C、C++ 程序？</a>  </p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/zztttt.github.io/tags/cpp/" rel="tag"># cpp</a>
+              <a href="/zztttt.github.io/tags/vscode/" rel="tag"># vscode</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/zztttt.github.io/2020/07/05/VSCode-git免密push/" rel="prev" title="VSCode: git免密push">
+      <i class="fa fa-chevron-left"></i> VSCode: git免密push
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/zztttt.github.io/2020/07/07/Vmware-ubuntu18-04-安装/" rel="next" title="Vmware: ubuntu18.04 安装">
+      Vmware: ubuntu18.04 安装 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#目的"><span class="nav-number">1.</span> <span class="nav-text">目的</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#准备材料"><span class="nav-number">2.</span> <span class="nav-text">准备材料</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MinGW配置"><span class="nav-number">3.</span> <span class="nav-text">MinGW配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#在VSCode中编写"><span class="nav-number">4.</span> <span class="nav-text">在VSCode中编写</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Reference"><span class="nav-number">5.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ZhangZhengtong</p>
+  <div class="site-description" itemprop="description">SE@SJTU</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/zztttt.github.io/archives/">
+        
+          <span class="site-state-item-count">32</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/zztttt.github.io/categories/">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/zztttt.github.io/tags/">
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZhangZhengtong</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/zztttt.github.io/lib/anime.min.js"></script>
+  <script src="/zztttt.github.io/lib/velocity/velocity.min.js"></script>
+  <script src="/zztttt.github.io/lib/velocity/velocity.ui.min.js"></script>
+<script src="/zztttt.github.io/js/utils.js"></script><script src="/zztttt.github.io/js/motion.js"></script>
+<script src="/zztttt.github.io/js/schemes/muse.js"></script>
+<script src="/zztttt.github.io/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

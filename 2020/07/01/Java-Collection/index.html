@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.8.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/zztttt.github.io/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/zztttt.github.io/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/zztttt.github.io/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/zztttt.github.io/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/zztttt.github.io/css/main.css">
+
+
+<link rel="stylesheet" href="/zztttt.github.io/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"github.com","root":"/zztttt.github.io/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="Hashmap底层是数组+链表/红黑树实现的。1234567//成员变量transient Node&amp;lt;K,V&amp;gt;[] table; //底层数据结构，用于存储添加到HashMap中的Key-value对transient Set&amp;lt;Map.Entry&amp;lt;K,V&amp;gt;&amp;gt; entrySet; //返回Node实体transient int size; //Map中的key-v">
+<meta name="keywords" content="java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java: Collection">
+<meta property="og:url" content="http://github.com/2020/07/01/Java-Collection/index.html">
+<meta property="og:site_name" content="zztttt">
+<meta property="og:description" content="Hashmap底层是数组+链表/红黑树实现的。1234567//成员变量transient Node&amp;lt;K,V&amp;gt;[] table; //底层数据结构，用于存储添加到HashMap中的Key-value对transient Set&amp;lt;Map.Entry&amp;lt;K,V&amp;gt;&amp;gt; entrySet; //返回Node实体transient int size; //Map中的key-v">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://zztttt.github.io/picture/java-collection/hashmap.png">
+<meta property="og:image" content="https://zztttt.github.io/picture/java-collection/hashset.png">
+<meta property="og:updated_time" content="2022-08-13T10:01:38.570Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java: Collection">
+<meta name="twitter:description" content="Hashmap底层是数组+链表/红黑树实现的。1234567//成员变量transient Node&amp;lt;K,V&amp;gt;[] table; //底层数据结构，用于存储添加到HashMap中的Key-value对transient Set&amp;lt;Map.Entry&amp;lt;K,V&amp;gt;&amp;gt; entrySet; //返回Node实体transient int size; //Map中的key-v">
+<meta name="twitter:image" content="https://zztttt.github.io/picture/java-collection/hashmap.png">
+
+<link rel="canonical" href="http://github.com/2020/07/01/Java-Collection/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Java: Collection | zztttt</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/zztttt.github.io/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">zztttt</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/zztttt.github.io/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/zztttt.github.io/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope="" itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://github.com/2020/07/01/Java-Collection/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/zztttt.github.io/images/avatar.gif">
+      <meta itemprop="name" content="ZhangZhengtong">
+      <meta itemprop="description" content="SE@SJTU">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="zztttt">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Java: Collection
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-07-01 18:45:50" itemprop="dateCreated datePublished" datetime="2020-07-01T18:45:50+08:00">2020-07-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-08-13 18:01:38" itemprop="dateModified" datetime="2022-08-13T18:01:38+08:00">2022-08-13</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/zztttt.github.io/categories/zztttt/" itemprop="url" rel="index"><span itemprop="name">zztttt</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing">
+                  <a href="/zztttt.github.io/categories/interview/" itemprop="url" rel="index"><span itemprop="name">interview</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="Hashmap"><a href="#Hashmap" class="headerlink" title="Hashmap"></a>Hashmap</h2><p>底层是数组+链表/红黑树实现的。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//成员变量</span></span><br><span class="line"><span class="keyword">transient</span> Node&lt;K,V&gt;[] table; <span class="comment">//底层数据结构，用于存储添加到HashMap中的Key-value对</span></span><br><span class="line"><span class="keyword">transient</span> Set&lt;Map.Entry&lt;K,V&gt;&gt; entrySet; <span class="comment">//返回Node实体</span></span><br><span class="line"><span class="keyword">transient</span> <span class="keyword">int</span> size; <span class="comment">//Map中的key-value对的数量</span></span><br><span class="line"><span class="keyword">transient</span> <span class="keyword">int</span> modCount;</span><br><span class="line"><span class="keyword">int</span> threshold;<span class="comment">//临界值,当超过临界值时，HashMap就该扩容</span></span><br><span class="line"><span class="keyword">final</span> <span class="keyword">float</span> loadFactor;<span class="comment">//装载因子,衡量HashMap满的程度，默认值为DEFAULT_LOAD_FACTOR=0.75f</span></span><br></pre></td></tr></table></figure></p>
+<p>Node是一个static内部类。多个Node以链表的形式连接起来，然后在Hashmap内用数组来保留这些链表的起点，结合了这两种数据结构，保留了各自的优点，又弥补了各自的缺点。<br><strong>但是是JDK8中，如果链表长度太长就会转化为红黑树。</strong></p>
+<ul>
+<li>Node&lt;K,V&gt;[] table<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Node</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt; <span class="keyword">implements</span> <span class="title">Map</span>.<span class="title">Entry</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt; </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">int</span> hash;</span><br><span class="line">    <span class="keyword">final</span> K key;</span><br><span class="line">    V value;</span><br><span class="line">    Node&lt;K,V&gt; next;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">int</span> <span class="title">hashCode</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> Objects.hashCode(key) ^ Objects.hashCode(value);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>因此Hashmap的结构如下所示。<br><img src="https://zztttt.github.io/picture/java-collection/hashmap.png" alt="hashmap">  </p>
+<ul>
+<li><p>Set&lt;Map.Entry&lt;K,V&gt;&gt; entrySet<br>entrySet变量为EntrySet实体，Map.Entry&lt;K,V&gt;是一个接口，Node类就实现了该接口</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> Set&lt;Map.Entry&lt;K,V&gt;&gt; entrySet() &#123;</span><br><span class="line">    Set&lt;Map.Entry&lt;K,V&gt;&gt; es;</span><br><span class="line">    <span class="keyword">return</span> (es = entrySet) == <span class="keyword">null</span> ? (entrySet = <span class="keyword">new</span> EntrySet()) : es;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>扩容机制<br>容量的规则为2的幂次，即capacity可以是1，2，4，8，16，32…<br>根据传进来的容量来找最近的2的幂次</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> <span class="title">tableSizeFor</span><span class="params">(<span class="keyword">int</span> capacity)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> n = capacity - <span class="number">1</span>;</span><br><span class="line">    n |= n &gt;&gt;&gt; <span class="number">1</span>;</span><br><span class="line">    n |= n &gt;&gt;&gt; <span class="number">2</span>;</span><br><span class="line">    n |= n &gt;&gt;&gt; <span class="number">4</span>;</span><br><span class="line">    n |= n &gt;&gt;&gt; <span class="number">8</span>;</span><br><span class="line">    n |= n &gt;&gt;&gt; <span class="number">16</span>;</span><br><span class="line">    <span class="keyword">return</span> (n &lt; <span class="number">0</span>) ? <span class="number">1</span> : (n &gt;= MAXIMUM_CAPACITY) ? MAXIMUM_CAPACITY : n + <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="HashSet"><a href="#HashSet" class="headerlink" title="HashSet"></a>HashSet</h2><p>是java中Set接口的一个实现类，底层是用Hashmap实现的，而Hashmap是数组+链表/红黑树实现的。如果链表长度大于8，就转化为红黑树，如果容量不够，则需扩容。<br><img src="https://zztttt.github.io/picture/java-collection/hashset.png" alt="hashset">  </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HashSet</span>&lt;<span class="title">E</span>&gt; <span class="keyword">extends</span> <span class="title">AbstractSet</span>&lt;<span class="title">E</span>&gt; <span class="keyword">implements</span> <span class="title">Set</span>&lt;<span class="title">E</span>&gt;, <span class="title">Cloneable</span>, <span class="title">java</span>.<span class="title">io</span>.<span class="title">Serializable</span></span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>常用方法：<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">transient</span> HashMap&lt;E,Object&gt; map;</span><br><span class="line"></span><br><span class="line"><span class="comment">//初始化一个空的set</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">HashSet</span><span class="params">()</span></span>&#123;</span><br><span class="line">    map = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 传入的集合添加到新的set</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">HashSet</span><span class="params">(Collection&lt;? extends E&gt; c)</span></span>&#123;</span><br><span class="line">    map = <span class="keyword">new</span> HashMap&lt;&gt;(Math.max((<span class="keyword">int</span>) (c.size()/.<span class="number">75f</span>) + <span class="number">1</span>, <span class="number">16</span>));</span><br><span class="line">    addAll(c);</span><br><span class="line">&#125; </span><br><span class="line"><span class="comment">//明确初始容量和装载因子</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">HashSet</span><span class="params">(<span class="keyword">int</span> initialCapacity, <span class="keyword">float</span> loadFactor)</span></span>&#123;</span><br><span class="line">    map = <span class="keyword">new</span> HashMap&lt;&gt;(initialCapacity, loadFactor);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//明确容量</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">HashSet</span><span class="params">(<span class="keyword">int</span> initialCapacity)</span></span>&#123;</span><br><span class="line">    map = <span class="keyword">new</span> HashMap&lt;&gt;(initialCapacity);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// add， value值是被写死的</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Object PRESENT = <span class="keyword">new</span> Object();</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">add</span><span class="params">(E e)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> map.put(e, PRESENT)==<span class="keyword">null</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// remove，调用map的remove</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">remove</span><span class="params">(Object o)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> map.remove(o)==PRESENT;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 遍历</span></span><br><span class="line">Iterator it = set.iterator();</span><br><span class="line"><span class="keyword">while</span> (it.hasNext()) &#123;</span><br><span class="line">    System.out.println(it.next());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="LinkedHashSet"><a href="#LinkedHashSet" class="headerlink" title="LinkedHashSet"></a>LinkedHashSet</h2><p>是HashSet的派生类。源码没什么实质性的东西，都是对HashSet的一个继承。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LinkedHashSet</span>&lt;<span class="title">E</span>&gt; <span class="keyword">extends</span> <span class="title">HashSet</span>&lt;<span class="title">E</span>&gt; </span></span><br><span class="line"><span class="class">    <span class="keyword">implements</span> <span class="title">Set</span>&lt;<span class="title">E</span>&gt;, <span class="title">Cloneable</span>, <span class="title">java</span>.<span class="title">io</span>.<span class="title">Serializable</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">LinkedHashSet</span><span class="params">(<span class="keyword">int</span> initialCapacity, <span class="keyword">float</span> loadFactor)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(initialCapacity, loadFactor, <span class="keyword">true</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">LinkedHashSet</span><span class="params">(<span class="keyword">int</span> initialCapacity)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(initialCapacity, .<span class="number">75f</span>, <span class="keyword">true</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">LinkedHashSet</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(<span class="number">16</span>, .<span class="number">75f</span>, <span class="keyword">true</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">LinkedHashSet</span><span class="params">(Collection&lt;? extends E&gt; c)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(Math.max(<span class="number">2</span>*c.size(), <span class="number">11</span>), .<span class="number">75f</span>, <span class="keyword">true</span>);</span><br><span class="line">        addAll(c);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Spliterator&lt;E&gt; <span class="title">spliterator</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> Spliterators.spliterator(<span class="keyword">this</span>, Spliterator.DISTINCT | Spliterator.ORDERED);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="TreeSet"><a href="#TreeSet" class="headerlink" title="TreeSet"></a>TreeSet</h2><p>完全依赖于TreeMap来实现。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TreeSet</span>&lt;<span class="title">E</span>&gt; <span class="keyword">extends</span> <span class="title">AbstractSet</span>&lt;<span class="title">E</span>&gt;</span></span><br><span class="line"><span class="class">    <span class="keyword">implements</span> <span class="title">NavigableSet</span>&lt;<span class="title">E</span>&gt;, <span class="title">Cloneable</span>, <span class="title">java</span>.<span class="title">io</span>.<span class="title">Serializable</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">TreeSet</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>(<span class="keyword">new</span> TreeMap&lt;E,Object&gt;());</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">TreeSet</span><span class="params">(Comparator&lt;? <span class="keyword">super</span> E&gt; comparator)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>(<span class="keyword">new</span> TreeMap&lt;&gt;(comparator));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">TreeSet</span><span class="params">(Collection&lt;? extends E&gt; c)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>();</span><br><span class="line">        addAll(c);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">TreeSet</span><span class="params">(SortedSet&lt;E&gt; s)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>(s.comparator());</span><br><span class="line">        addAll(s);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><p><a href="https://www.cnblogs.com/LiaHon/p/11142958.html" target="_blank" rel="noopener">HashMap原理(一) 概念和底层架构</a><br><a href="https://www.cnblogs.com/LiaHon/p/11257805.html" target="_blank" rel="noopener">Java集合 HashSet的原理及常用方法</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/zztttt.github.io/tags/java/" rel="tag"># java</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/zztttt.github.io/2020/07/01/computer-network/" rel="prev" title="computer network">
+      <i class="fa fa-chevron-left"></i> computer network
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/zztttt.github.io/2020/07/03/database/" rel="next" title="database">
+      database <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Hashmap"><span class="nav-number">1.</span> <span class="nav-text">Hashmap</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HashSet"><span class="nav-number">2.</span> <span class="nav-text">HashSet</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#LinkedHashSet"><span class="nav-number">3.</span> <span class="nav-text">LinkedHashSet</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TreeSet"><span class="nav-number">4.</span> <span class="nav-text">TreeSet</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Reference"><span class="nav-number">5.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">ZhangZhengtong</p>
+  <div class="site-description" itemprop="description">SE@SJTU</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/zztttt.github.io/archives/">
+        
+          <span class="site-state-item-count">32</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/zztttt.github.io/categories/">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/zztttt.github.io/tags/">
+        <span class="site-state-item-count">18</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ZhangZhengtong</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/zztttt.github.io/lib/anime.min.js"></script>
+  <script src="/zztttt.github.io/lib/velocity/velocity.min.js"></script>
+  <script src="/zztttt.github.io/lib/velocity/velocity.ui.min.js"></script>
+<script src="/zztttt.github.io/js/utils.js"></script><script src="/zztttt.github.io/js/motion.js"></script>
+<script src="/zztttt.github.io/js/schemes/muse.js"></script>
+<script src="/zztttt.github.io/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
